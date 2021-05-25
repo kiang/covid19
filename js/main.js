@@ -79,7 +79,9 @@ map.on('singleclick', function (evt) {
       }
       var message = '';
       message += '<table class="table table-dark"><tbody>';
-      message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey] + '</td></tr>';
+      message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
+      message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
+      message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
       message += '</tbody></table>';
       sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
       currentFeature.setStyle(cityStyle);
@@ -138,14 +140,14 @@ function cityStyle(f) {
     strokeWidth = 5;
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
-  if (cityMeta[cityKey]) {
-    if (cityMeta[cityKey] > 41) {
+  if (cityMeta[cityKey].confirmed) {
+    if (cityMeta[cityKey].rate > 10) {
       color = 'rgba(153,52,4,0.6)';
-    } else if (cityMeta[cityKey] > 8) {
+    } else if (cityMeta[cityKey].rate > 5) {
       color = 'rgba(217,95,14,0.6)';
-    } else if (cityMeta[cityKey] > 2) {
+    } else if (cityMeta[cityKey].rate > 0) {
       color = 'rgba(254,153,41,0.6)';
-    } else if (cityMeta[cityKey] > 0) {
+    } else if (cityMeta[cityKey].confirmed > 0) {
       color = 'rgba(254,217,142,0.6)';
     }
   }
@@ -165,7 +167,7 @@ function cityStyle(f) {
     })
   });
   if (cityMeta[cityKey]) {
-    baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].toString());
+    baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + cityMeta[cityKey].rate.toString() + ')');
   }
   return baseStyle;
 }
@@ -259,9 +261,23 @@ $.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, funct
           }
           break;
       }
-      cityMeta[cityKey] = c[c1][c2];
+      cityMeta[cityKey] = {
+        confirmed: c[c1][c2],
+        population: 0,
+        rate: 0.0,
+      };
     }
   }
-}).then(function () {
-  city.getSource().refresh();
+  $.get('https://kiang.github.io/tw_population/json/city/2021/04.json', {}, function (c) {
+    for (code in c) {
+      if (cityMeta[c[code].area]) {
+        cityMeta[c[code].area].population = c[code].population;
+        if(cityMeta[c[code].area].confirmed > 0) {
+          cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 100000) / 10;
+        }
+      }
+    }
+    city.getSource().refresh();
+  })
 });
+
