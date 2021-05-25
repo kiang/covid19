@@ -145,7 +145,7 @@ function cityStyle(f) {
       color = 'rgba(153,52,4,0.6)';
     } else if (cityMeta[cityKey].rate > 5) {
       color = 'rgba(217,95,14,0.6)';
-    } else if (cityMeta[cityKey].rate > 0) {
+    } else if (cityMeta[cityKey].rate > 1) {
       color = 'rgba(254,153,41,0.6)';
     } else if (cityMeta[cityKey].confirmed > 0) {
       color = 'rgba(254,217,142,0.6)';
