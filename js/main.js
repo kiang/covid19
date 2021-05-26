@@ -23,11 +23,13 @@ var appView = new ol.View({
 
 var vectorPoints = new ol.layer.Vector({
   source: new ol.source.Vector({
+    url: 'https://kiang.github.io/nidss.cdc.gov.tw/data/points.json',
     format: new ol.format.GeoJSON({
       featureProjection: appView.getProjection()
     })
   }),
-  style: pointStyle
+  style: pointStyle,
+  zIndex: 100
 });
 
 var city = new ol.layer.Vector({
@@ -37,7 +39,8 @@ var city = new ol.layer.Vector({
       featureProjection: appView.getProjection()
     })
   }),
-  style: cityStyle
+  style: cityStyle,
+  zIndex: 50
 });
 
 var map = new ol.Map({
@@ -53,20 +56,38 @@ map.on('singleclick', function (evt) {
   map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
     if (false === pointClicked) {
       firstPosDone = true;
-      var p = feature.getProperties();
-      var cityKey = p.COUNTYNAME + p.TOWNNAME;
       currentFeature = feature;
       if (lastFeature) {
-        lastFeature.setStyle(cityStyle);
+        if(lastFeatureType === 'point') {
+          lastFeature.setStyle(pointStyle);
+        } else {
+          lastFeature.setStyle(cityStyle);
+        }
       }
-      var message = '';
-      message += '<table class="table table-dark"><tbody>';
-      message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
-      message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
-      message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
-      message += '</tbody></table>';
-      sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
-      currentFeature.setStyle(cityStyle);
+      var p = feature.getProperties();
+      if (p.COUNTYNAME) {
+        var cityKey = p.COUNTYNAME + p.TOWNNAME;
+        var message = '';
+        message += '<table class="table table-dark"><tbody>';
+        message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
+        message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
+        message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
+        message += '</tbody></table>';
+        sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
+        currentFeature.setStyle(cityStyle);
+        lastFeatureType = 'area';
+      } else {
+        var message = '';
+        message += '<table class="table table-dark"><tbody>';
+        for(k in p) {
+          message += '<tr><th scope="row">' + k + '</th><td>' + p[k] + '</td></tr>';
+        }
+        message += '</tbody></table>';
+        sidebarTitle.innerHTML = p['站名'];
+        currentFeature.setStyle(pointStyle);
+        lastFeatureType = 'point';
+      }
+
       lastFeature = currentFeature;
       content.innerHTML = message;
       sidebar.open('home');
@@ -76,7 +97,7 @@ map.on('singleclick', function (evt) {
 });
 
 function pointStyle(f) {
-  var p = f.getProperties(), color, stroke, radius, pointCount;
+  var p = f.getProperties(), stroke, radius;
   if (f === currentFeature) {
     stroke = new ol.style.Stroke({
       color: '#000',
@@ -88,26 +109,15 @@ function pointStyle(f) {
       color: '#fff',
       width: 2
     });
-    if (p.type === 'a1') {
-      radius = 15;
-    } else {
-      radius = 8;
-    }
-  }
-  if (p.type === 'a1') {
-    pointCount = 5;
-    color = '#ff0000';
-  } else {
-    pointCount = 3;
-    color = '#cccc00';
+    radius = 15;
   }
 
   return new ol.style.Style({
     image: new ol.style.RegularShape({
       radius: radius,
-      points: pointCount,
+      points: 3,
       fill: new ol.style.Fill({
-        color: color
+        color: '#AAAA33'
       }),
       stroke: stroke
     })
@@ -156,6 +166,7 @@ function cityStyle(f) {
 
 var currentFeature = false;
 var lastFeature = false;
+var lastFeatureType = '';
 
 var geolocation = new ol.Geolocation({
   projection: appView.getProjection()
@@ -209,8 +220,6 @@ $('#btn-geolocation').click(function () {
   return false;
 });
 
-var pointFeatures = [];
-vectorPoints.setZIndex(100);
 $.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (c) {
   for (c1 in c) {
     for (c2 in c[c1]) {
@@ -254,7 +263,7 @@ $.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, funct
     for (code in c) {
       if (cityMeta[c[code].area]) {
         cityMeta[c[code].area].population = c[code].population;
-        if(cityMeta[c[code].area].confirmed > 0) {
+        if (cityMeta[c[code].area].confirmed > 0) {
           cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 100000) / 10;
         }
       }
