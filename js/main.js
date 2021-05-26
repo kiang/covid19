@@ -96,7 +96,11 @@ map.on('singleclick', function (evt) {
   });
 });
 
+var showPoints = false;
 function pointStyle(f) {
+  if(false === showPoints) {
+    return null;
+  }
   var p = f.getProperties(), stroke, radius;
   if (f === currentFeature) {
     stroke = new ol.style.Stroke({
@@ -218,6 +222,15 @@ $('#btn-geolocation').click(function () {
     alert('目前使用的設備無法提供地理資訊');
   }
   return false;
+});
+
+$('#btn-pointShow').click(function() {
+  if(false === showPoints) {
+    showPoints = true;
+  } else {
+    showPoints = false;
+  }
+  vectorPoints.getSource().refresh();
 });
 
 $.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (c) {
