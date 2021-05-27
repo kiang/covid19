@@ -235,7 +235,8 @@ $('#btn-pointShow').click(function() {
   vectorPoints.getSource().refresh();
 });
 
-$.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (c) {
+$.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (r) {
+  var c = r.data;
   for (c1 in c) {
     for (c2 in c[c1]) {
       var cityKey = c1 + c2;
