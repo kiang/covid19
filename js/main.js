@@ -18,7 +18,9 @@ var cityMeta = {};
 
 var appView = new ol.View({
   center: ol.proj.fromLonLat([120.221507, 23.000694]),
-  zoom: 14
+  zoom: 14,
+  minZoom: 11,
+  maxZoom: 14
 });
 
 var vectorPoints = new ol.layer.Vector({
