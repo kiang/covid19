@@ -59,6 +59,25 @@
             <div class="sidebar-pane" id="home">
               <h1 class="sidebar-header"><span id="sidebarTitle">請點選地圖中的點</span><span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
               <div id="sidebarContent">請點選地圖中的點</div>
+              <hr />
+              <div>
+                <table class="table table-dark">
+                    <tbody>
+                        <tr>
+                            <th scope="row" colspan="2" style="text-align: center;">系統摘要</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">全國總數</th>
+                            <td><span id="metaTotal"></span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">異動時間</th>
+                            <td><span id="metaModified"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+              </div>
+              <hr />
               <div class="btn-group-vertical" role="group" style="width: 100%;">
                 <a href="https://github.com/kiang/covid19/issues" target="_blank" class="btn btn-primary btn-lg btn-block">網站問題反應</a>
               </div>
@@ -68,7 +87,7 @@
                 <div>
                     資料來源：
                     <ul>
-                        <li><a href="https://nidss.cdc.gov.tw/nndss/DiseaseMap?id=19CoV" target="_blank">傳染病統計資料查詢系統</a></li>
+                        <li><a href="https://nidss.cdc.gov.tw/nndss/disease?id=19cov" target="_blank">傳染病統計資料查詢系統</a></li>
                     </ul>
                     * 資料每天更新
                 </div>

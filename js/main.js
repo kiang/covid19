@@ -236,6 +236,8 @@ $('#btn-pointShow').click(function() {
 });
 
 $.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (r) {
+  $('span#metaTotal').html(r.meta.total);
+  $('span#metaModified').html(r.meta.modified);
   var c = r.data;
   for (c1 in c) {
     for (c2 in c[c1]) {
