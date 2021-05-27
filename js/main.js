@@ -136,7 +136,7 @@ function cityStyle(f) {
     strokeWidth = 5;
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
-  if (cityMeta[cityKey].confirmed) {
+  if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
     if (cityMeta[cityKey].rate > 10) {
       color = 'rgba(153,52,4,0.6)';
     } else if (cityMeta[cityKey].rate > 5) {
