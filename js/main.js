@@ -80,7 +80,9 @@ map.on('singleclick', function (evt) {
         var message = '';
         message += '<table class="table table-dark"><tbody>';
         for(k in p) {
-          message += '<tr><th scope="row">' + k + '</th><td>' + p[k] + '</td></tr>';
+          if(k !== 'geometry') {
+            message += '<tr><th scope="row">' + k + '</th><td>' + p[k] + '</td></tr>';
+          }
         }
         message += '</tbody></table>';
         sidebarTitle.innerHTML = p['站名'];
