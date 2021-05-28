@@ -58,7 +58,7 @@ map.on('singleclick', function (evt) {
       firstPosDone = true;
       currentFeature = feature;
       if (lastFeature) {
-        if(lastFeatureType === 'point') {
+        if (lastFeatureType === 'point') {
           lastFeature.setStyle(pointStyle);
         } else {
           lastFeature.setStyle(cityStyle);
@@ -79,8 +79,8 @@ map.on('singleclick', function (evt) {
       } else {
         var message = '';
         message += '<table class="table table-dark"><tbody>';
-        for(k in p) {
-          if(k !== 'geometry') {
+        for (k in p) {
+          if (k !== 'geometry') {
             message += '<tr><th scope="row">' + k + '</th><td>' + p[k] + '</td></tr>';
           }
         }
@@ -100,7 +100,7 @@ map.on('singleclick', function (evt) {
 
 var showPoints = false;
 function pointStyle(f) {
-  if(false === showPoints) {
+  if (false === showPoints) {
     return null;
   }
   var p = f.getProperties(), stroke, radius;
@@ -226,8 +226,8 @@ $('#btn-geolocation').click(function () {
   return false;
 });
 
-$('#btn-pointShow').click(function() {
-  if(false === showPoints) {
+$('#btn-pointShow').click(function () {
+  if (false === showPoints) {
     showPoints = true;
   } else {
     showPoints = false;
