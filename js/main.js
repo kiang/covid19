@@ -235,7 +235,7 @@ $('#btn-pointShow').click(function () {
   vectorPoints.getSource().refresh();
 });
 
-$.get('https://kiang.github.io/nidss.cdc.gov.tw/data/2021/19CoV.json', {}, function (r) {
+$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
   $('span#metaModified').html(r.meta.modified);
   var c = r.data;
