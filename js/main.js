@@ -51,6 +51,7 @@ var map = new ol.Map({
 
 map.addControl(sidebar);
 var pointClicked = false;
+var odPool = {};
 map.on('singleclick', function (evt) {
   pointClicked = false;
   map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
@@ -76,6 +77,16 @@ map.on('singleclick', function (evt) {
         sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
         currentFeature.setStyle(cityStyle);
         lastFeatureType = 'area';
+
+        if(!odPool[cityKey]) {
+          $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function(r) {
+            odPool[cityKey] = r;
+            showOdCharts(cityKey);
+          });
+        } else {
+          showOdCharts(cityKey);
+        }
+        
       } else {
         var message = '';
         message += '<table class="table table-dark"><tbody>';
@@ -97,6 +108,38 @@ map.on('singleclick', function (evt) {
     }
   });
 });
+
+function showOdCharts(cityKey) {
+  $('#odCharts').html('');
+  var chartDataPool = {
+    data: [],
+    categories: [],
+  };
+  var skipCount = 40;
+  for(k in odPool[cityKey]['days']) {
+    if(--skipCount < 0) {
+      chartDataPool.categories.push(k.substring(4));
+      chartDataPool.data.push(odPool[cityKey]['days'][k]);
+    }
+  }
+  var options = {
+    chart: {
+      type: 'bar'
+    },
+    series: [
+      {
+        name: '確診',
+        data: chartDataPool.data
+      }
+    ],
+    xaxis: {
+      categories: chartDataPool.categories
+    }
+  }
+  
+  var chart = new ApexCharts(document.querySelector('#odCharts'), options)
+  chart.render();
+}
 
 var showPoints = false;
 function pointStyle(f) {
@@ -235,6 +278,7 @@ $('#btn-pointShow').click(function () {
   vectorPoints.getSource().refresh();
 });
 
+var odKeys = [];
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
   $('span#metaModified').html(r.meta.modified);
@@ -270,6 +314,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
           }
           break;
       }
+      odKeys[cityKey] = c1 + c2;
       cityMeta[cityKey] = {
         confirmed: c[c1][c2],
         population: 0,
