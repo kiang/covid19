@@ -78,15 +78,15 @@ map.on('singleclick', function (evt) {
         currentFeature.setStyle(cityStyle);
         lastFeatureType = 'area';
 
-        if(!odPool[cityKey]) {
-          $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function(r) {
+        if (!odPool[cityKey]) {
+          $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function (r) {
             odPool[cityKey] = r;
             showOdCharts(cityKey);
           });
         } else {
           showOdCharts(cityKey);
         }
-        
+
       } else {
         var message = '';
         message += '<table class="table table-dark"><tbody>';
@@ -111,13 +111,13 @@ map.on('singleclick', function (evt) {
 
 var chart1 = null, chart2 = null, chart3 = null;
 function showOdCharts(cityKey) {
-  if(chart1 !== null) {
+  if (chart1 !== null) {
     chart1.destroy();
   }
-  if(chart2 !== null) {
+  if (chart2 !== null) {
     chart2.destroy();
   }
-  if(chart3 !== null) {
+  if (chart3 !== null) {
     chart3.destroy();
   }
   var chartDataPool = {
@@ -127,13 +127,13 @@ function showOdCharts(cityKey) {
     ageSeries: [],
   };
   var skipCount = 40;
-  for(k in odPool[cityKey]['days']) {
-    if(--skipCount < 0) {
+  for (k in odPool[cityKey]['days']) {
+    if (--skipCount < 0) {
       chartDataPool.categories.push(k.substring(4));
       chartDataPool.data.push(odPool[cityKey]['days'][k]);
     }
   }
-  for(k in odPool[cityKey]['age']) {
+  for (k in odPool[cityKey]['age']) {
     chartDataPool.ageKey.push(k);
     chartDataPool.ageSeries.push(odPool[cityKey]['age'][k]);
   }
@@ -310,9 +310,11 @@ $('#btn-pointShow').click(function () {
 });
 
 var odKeys = [];
+var currentDay = '';
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
   $('span#metaModified').html(r.meta.modified);
+  currentDay = r.meta.day;
   var c = r.data;
   for (c1 in c) {
     for (c2 in c[c1]) {
@@ -366,3 +368,95 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
   })
 });
 
+function showDay(theDay) {
+  $('#showingDay').html(theDay);
+  $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
+    for (k in cityMeta) {
+      cityMeta[k].confirmed = 0;
+      cityMeta[k].rate = 0.0;
+    }
+    $('span#metaTotal').html(r.meta.total);
+    $('span#metaModified').html(r.meta.modified);
+    currentDay = r.meta.day;
+    var c = r.data;
+    for (c1 in c) {
+      for (c2 in c[c1]) {
+        var cityKey = c1 + c2;
+        switch (c1) {
+          case '台南市':
+            cityKey = '臺南市' + c2;
+            break;
+          case '台北市':
+            cityKey = '臺北市' + c2;
+            break;
+          case '台中市':
+            cityKey = '臺中市' + c2;
+            break;
+          case '台東縣':
+            if (c2 !== '台東市') {
+              cityKey = '臺東縣' + c2;
+            } else {
+              cityKey = '臺東縣臺東市';
+            }
+            break;
+          case '屏東縣':
+            if (c2 === '霧台鄉') {
+              cityKey = c1 + '霧臺鄉';
+            }
+            break;
+          case '雲林縣':
+            if (c2 === '台西鄉') {
+              cityKey = c1 + '臺西鄉';
+            }
+            break;
+        }
+        cityMeta[cityKey].confirmed = c[c1][c2];
+        cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
+        city.getSource().refresh();
+      }
+    }
+  });
+}
+
+var today = new Date();
+var dayBegin = new Date(2021, 2, 30);
+var dayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+$('a#btn-Previous').click(function (e) {
+  e.preventDefault();
+  var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
+  var newDay = new Date(cDay.getTime() - 86400000);
+  if (newDay.getTime() > dayBegin.getTime()) {
+    var ymd = {
+      y: newDay.getFullYear(),
+      m: newDay.getMonth() + 1,
+      d: newDay.getDate()
+    };
+    if (ymd.m < 10) {
+      ymd.m = '0' + ymd.m;
+    }
+    if (ymd.d < 10) {
+      ymd.d = '0' + ymd.d;
+    }
+    showDay('' + ymd.y + ymd.m + ymd.d);
+  }
+});
+
+$('a#btn-Next').click(function (e) {
+  e.preventDefault();
+  var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
+  var newDay = new Date(cDay.getTime() + 86400000);
+  if (newDay.getTime() < dayEnd.getTime()) {
+    var ymd = {
+      y: newDay.getFullYear(),
+      m: newDay.getMonth() + 1,
+      d: newDay.getDate()
+    };
+    if (ymd.m < 10) {
+      ymd.m = '0' + ymd.m;
+    }
+    if (ymd.d < 10) {
+      ymd.d = '0' + ymd.d;
+    }
+    showDay('' + ymd.y + ymd.m + ymd.d);
+  }
+});
