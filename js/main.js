@@ -109,11 +109,22 @@ map.on('singleclick', function (evt) {
   });
 });
 
+var chart1 = null, chart2 = null, chart3 = null;
 function showOdCharts(cityKey) {
-  $('#odCharts').html('');
+  if(chart1 !== null) {
+    chart1.destroy();
+  }
+  if(chart2 !== null) {
+    chart2.destroy();
+  }
+  if(chart3 !== null) {
+    chart3.destroy();
+  }
   var chartDataPool = {
     data: [],
     categories: [],
+    ageKey: [],
+    ageSeries: [],
   };
   var skipCount = 40;
   for(k in odPool[cityKey]['days']) {
@@ -122,7 +133,11 @@ function showOdCharts(cityKey) {
       chartDataPool.data.push(odPool[cityKey]['days'][k]);
     }
   }
-  var options = {
+  for(k in odPool[cityKey]['age']) {
+    chartDataPool.ageKey.push(k);
+    chartDataPool.ageSeries.push(odPool[cityKey]['age'][k]);
+  }
+  chart1 = new ApexCharts(document.querySelector('#odChart1'), {
     chart: {
       type: 'bar'
     },
@@ -135,10 +150,26 @@ function showOdCharts(cityKey) {
     xaxis: {
       categories: chartDataPool.categories
     }
-  }
-  
-  var chart = new ApexCharts(document.querySelector('#odCharts'), options)
-  chart.render();
+  });
+  chart1.render();
+
+  chart2 = new ApexCharts(document.querySelector('#odChart2'), {
+    chart: {
+      type: 'pie'
+    },
+    series: [odPool[cityKey].gender.m, odPool[cityKey].gender.f],
+    labels: ['男', '女']
+  });
+  chart2.render();
+
+  chart3 = new ApexCharts(document.querySelector('#odChart3'), {
+    chart: {
+      type: 'pie'
+    },
+    series: chartDataPool.ageSeries,
+    labels: chartDataPool.ageKey
+  });
+  chart3.render();
 }
 
 var showPoints = false;
