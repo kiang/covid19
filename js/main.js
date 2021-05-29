@@ -240,6 +240,8 @@ function cityStyle(f) {
   });
   if (cityMeta[cityKey]) {
     baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + cityMeta[cityKey].rate.toString() + ')');
+  } else {
+    baseStyle.getText().setText(p.TOWNNAME + ' 0');
   }
   return baseStyle;
 }
