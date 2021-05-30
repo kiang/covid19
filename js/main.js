@@ -106,6 +106,7 @@ map.on('singleclick', function (evt) {
           }
         }
         message += '</tbody></table>';
+        message += '<p>快篩站資料由 g0v 社群彙整， g0v 貢獻者以創用 CC 姓名標示 4.0 授權，網址： <a href="http://bit.ly/TaiwanRapidTests" target="_blank">http://bit.ly/TaiwanRapidTests</a></p>';
         sidebarTitle.innerHTML = p['站名'];
         currentFeature.setStyle(pointStyle);
         lastFeatureType = 'point';
