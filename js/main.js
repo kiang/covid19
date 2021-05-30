@@ -165,10 +165,19 @@ function showOdCharts(cityKey) {
 
   chart3 = new ApexCharts(document.querySelector('#odChart3'), {
     chart: {
-      type: 'pie'
+      type: 'bar'
     },
-    series: chartDataPool.ageSeries,
-    labels: chartDataPool.ageKey
+    series: [{
+      data: chartDataPool.ageSeries
+    }],
+    xaxis: {
+      categories: chartDataPool.ageKey
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true
+      }
+    }
   });
   chart3.render();
 }
