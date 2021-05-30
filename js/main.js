@@ -65,30 +65,40 @@ map.on('singleclick', function (evt) {
           lastFeature.setStyle(cityStyle);
         }
       }
+      if (chart1 !== null) {
+        chart1.destroy();
+      }
+      if (chart2 !== null) {
+        chart2.destroy();
+      }
+      if (chart3 !== null) {
+        chart3.destroy();
+      }
       var p = feature.getProperties();
+      var message = '';
       if (p.COUNTYNAME) {
         var cityKey = p.COUNTYNAME + p.TOWNNAME;
-        var message = '';
-        message += '<table class="table table-dark"><tbody>';
-        message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
-        message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
-        message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
-        message += '</tbody></table>';
-        sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
-        currentFeature.setStyle(cityStyle);
-        lastFeatureType = 'area';
+        if (cityMeta[cityKey]) {
+          message += '<table class="table table-dark"><tbody>';
+          message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
+          message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
+          message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
+          message += '</tbody></table>';
+          sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
+          currentFeature.setStyle(cityStyle);
+          lastFeatureType = 'area';
 
-        if (!odPool[cityKey]) {
-          $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function (r) {
-            odPool[cityKey] = r;
+          if (!odPool[cityKey]) {
+            $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function (r) {
+              odPool[cityKey] = r;
+              showOdCharts(cityKey);
+            });
+          } else {
             showOdCharts(cityKey);
-          });
-        } else {
-          showOdCharts(cityKey);
+          }
         }
 
       } else {
-        var message = '';
         message += '<table class="table table-dark"><tbody>';
         for (k in p) {
           if (k !== 'geometry') {
@@ -111,15 +121,6 @@ map.on('singleclick', function (evt) {
 
 var chart1 = null, chart2 = null, chart3 = null;
 function showOdCharts(cityKey) {
-  if (chart1 !== null) {
-    chart1.destroy();
-  }
-  if (chart2 !== null) {
-    chart2.destroy();
-  }
-  if (chart3 !== null) {
-    chart3.destroy();
-  }
   var chartDataPool = {
     data: [],
     categories: [],
