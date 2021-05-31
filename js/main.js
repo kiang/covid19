@@ -145,7 +145,7 @@ function showOdCharts(cityKey) {
     },
     series: [
       {
-        name: '確診',
+        name: '確診人數',
         data: chartDataPool.data
       }
     ],
@@ -169,6 +169,7 @@ function showOdCharts(cityKey) {
       type: 'bar'
     },
     series: [{
+      name: '確診人數',
       data: chartDataPool.ageSeries
     }],
     xaxis: {
