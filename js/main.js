@@ -500,12 +500,14 @@ $('a#btn-countBased').click(function(e) {
   e.preventDefault();
   mapStyle = 'countBased';
   city.getSource().refresh();
-  $('div#showingMapStyle').html('累積數');
+  $('a#btn-countBased').removeClass('btn-secondary').addClass('btn-primary');
+  $('a#btn-rateBased').removeClass('btn-primary').addClass('btn-secondary');
 });
 
 $('a#btn-rateBased').click(function(e) {
   e.preventDefault();
   mapStyle = 'rateBased';
   city.getSource().refresh();
-  $('div#showingMapStyle').html('增加率');
+  $('a#btn-countBased').removeClass('btn-primary').addClass('btn-secondary');
+  $('a#btn-rateBased').removeClass('btn-secondary').addClass('btn-primary');
 });
