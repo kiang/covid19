@@ -216,6 +216,7 @@ function pointStyle(f) {
   })
 }
 
+var mapStyle = 'countBased';
 function cityStyle(f) {
   var p = f.getProperties();
   var color = 'rgba(255,255,255,0.5)';
@@ -224,14 +225,31 @@ function cityStyle(f) {
     strokeWidth = 5;
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
-  if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
-    if (cityMeta[cityKey].rate > 10) {
+  var keyRate = 0.0;
+  if(mapStyle === 'countBased') {
+    if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
+      keyRate = cityMeta[cityKey].rate;
+    }
+    if (keyRate > 10) {
       color = 'rgba(153,52,4,0.6)';
-    } else if (cityMeta[cityKey].rate > 5) {
+    } else if (keyRate > 5) {
       color = 'rgba(217,95,14,0.6)';
-    } else if (cityMeta[cityKey].rate > 1) {
+    } else if (keyRate > 1) {
       color = 'rgba(254,153,41,0.6)';
-    } else if (cityMeta[cityKey].confirmed > 0) {
+    } else if (keyRate > 0) {
+      color = 'rgba(254,217,142,0.6)';
+    }
+  } else {
+    if(cityMeta[cityKey]) {
+      keyRate = cityMeta[cityKey].increaseRate;
+    }
+    if (keyRate > 0.9) {
+      color = 'rgba(153,52,4,0.6)';
+    } else if (keyRate > 0.5) {
+      color = 'rgba(217,95,14,0.6)';
+    } else if (keyRate > 0.2) {
+      color = 'rgba(254,153,41,0.6)';
+    } else if (keyRate > 0) {
       color = 'rgba(254,217,142,0.6)';
     }
   }
@@ -251,7 +269,7 @@ function cityStyle(f) {
     })
   });
   if (cityMeta[cityKey]) {
-    baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + cityMeta[cityKey].rate.toString() + ')');
+    baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + keyRate.toString() + ')');
   } else {
     baseStyle.getText().setText(p.TOWNNAME + ' 0');
   }
@@ -366,6 +384,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
         confirmed: c[c1][c2],
         population: 0,
         rate: 0.0,
+        increaseRate: r.rate[c1][c2],
       };
     }
   }
@@ -388,6 +407,7 @@ function showDay(theDay) {
     for (k in cityMeta) {
       cityMeta[k].confirmed = 0;
       cityMeta[k].rate = 0.0;
+      cityMeta[k].increaseRate = 0.0;
     }
     $('span#metaTotal').html(r.meta.total);
     $('span#metaModified').html(r.meta.modified);
@@ -425,6 +445,7 @@ function showDay(theDay) {
             break;
         }
         cityMeta[cityKey].confirmed = c[c1][c2];
+        cityMeta[cityKey].increaseRate = r.rate[c1][c2];
         cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
         city.getSource().refresh();
       }
@@ -473,4 +494,18 @@ $('a#btn-Next').click(function (e) {
     }
     showDay('' + ymd.y + ymd.m + ymd.d);
   }
+});
+
+$('a#btn-countBased').click(function(e) {
+  e.preventDefault();
+  mapStyle = 'countBased';
+  city.getSource().refresh();
+  $('div#showingMapStyle').html('累積數');
+});
+
+$('a#btn-rateBased').click(function(e) {
+  e.preventDefault();
+  mapStyle = 'rateBased';
+  city.getSource().refresh();
+  $('div#showingMapStyle').html('增加率');
 });
