@@ -361,10 +361,35 @@ $('#btn-pointShow').click(function () {
 
 var townKeys = {};
 var currentDay = '';
+var populationDone = false;
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
-  $('span#metaTotal').html(r.meta.total);
+  showDayPool[r.meta.day] = r;
+  showDayUpdate(showDayPool[r.meta.day]);
+
+  $.get('https://kiang.github.io/tw_population/json/city/2021/04.json', {}, function (c) {
+    for (code in c) {
+      if (cityMeta[c[code].area]) {
+        cityMeta[c[code].area].population = c[code].population;
+        if (cityMeta[c[code].area].confirmed > 0) {
+          cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 100000) / 10;
+        }
+      }
+    }
+    populationDone = true;
+    city.getSource().refresh();
+  })
+});
+
+var showDayPool = {};
+function showDayUpdate(r) {
+  for (k in cityMeta) {
+    cityMeta[k].confirmed = 0;
+    cityMeta[k].rate = 0.0;
+    cityMeta[k].increaseRate = 0.0;
+  }
   $('span#metaDay').html(r.meta.day);
   $('span#mapDataDay').html(r.meta.day);
+  $('span#metaTotal').html(r.meta.total);
   $('span#metaModified').html(r.meta.modified);
   currentDay = r.meta.day;
   var c = r.data;
@@ -399,85 +424,38 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
           }
           break;
       }
-      townKeys[cityKey] = c1 + c2;
-      cityMeta[cityKey] = {
-        confirmed: c[c1][c2],
-        population: 0,
-        rate: 0.0,
-        increaseRate: parseFloat(r.rate[c1][c2]),
-        increase: r.increase[c1][c2],
-      };
-    }
-  }
-  $.get('https://kiang.github.io/tw_population/json/city/2021/04.json', {}, function (c) {
-    for (code in c) {
-      if (cityMeta[c[code].area]) {
-        cityMeta[c[code].area].population = c[code].population;
-        if (cityMeta[c[code].area].confirmed > 0) {
-          cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 100000) / 10;
-        }
+      if(!townKeys[cityKey]) {
+        townKeys[cityKey] = c1 + c2;
       }
-    }
-    city.getSource().refresh();
-  })
-});
-
-function showDay(theDay) {
-  $('#showingDay').html(theDay);
-  $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
-    for (k in cityMeta) {
-      cityMeta[k].confirmed = 0;
-      cityMeta[k].rate = 0.0;
-      cityMeta[k].increaseRate = 0.0;
-    }
-    $('span#metaDay').html(r.meta.day);
-    $('span#mapDataDay').html(r.meta.day);
-    $('span#metaTotal').html(r.meta.total);
-    $('span#metaModified').html(r.meta.modified);
-    currentDay = r.meta.day;
-    var c = r.data;
-    for (c1 in c) {
-      for (c2 in c[c1]) {
-        var cityKey = c1 + c2;
-        switch (c1) {
-          case '台南市':
-            cityKey = '臺南市' + c2;
-            break;
-          case '台北市':
-            cityKey = '臺北市' + c2;
-            break;
-          case '台中市':
-            cityKey = '臺中市' + c2;
-            break;
-          case '台東縣':
-            if (c2 !== '台東市') {
-              cityKey = '臺東縣' + c2;
-            } else {
-              cityKey = '臺東縣臺東市';
-            }
-            break;
-          case '屏東縣':
-            if (c2 === '霧台鄉') {
-              cityKey = c1 + '霧臺鄉';
-            }
-            break;
-          case '雲林縣':
-            if (c2 === '台西鄉') {
-              cityKey = c1 + '臺西鄉';
-            }
-            break;
-        }
-        if (!cityMeta[cityKey]) {
-          cityMeta[cityKey] = {};
-        }
-        cityMeta[cityKey].confirmed = c[c1][c2];
-        cityMeta[cityKey].increaseRate = r.rate[c1][c2];
-        cityMeta[cityKey].increase = r.increase[c1][c2];
-        cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
+      if (!cityMeta[cityKey]) {
+        cityMeta[cityKey] = {
+          confirmed: 0,
+          population: 0,
+          rate: 0.0,
+          increaseRate: 0.0,
+          increase: 0,
+        };
+      }
+      cityMeta[cityKey].confirmed = c[c1][c2];
+      cityMeta[cityKey].increaseRate = r.rate[c1][c2];
+      cityMeta[cityKey].increase = r.increase[c1][c2];
+      cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
+      if(populationDone) {
         city.getSource().refresh();
       }
     }
-  });
+  }
+}
+function showDay(theDay) {
+  $('#showingDay').html(theDay);
+  if(!showDayPool[theDay]) {
+    $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
+      showDayPool[theDay] = r;
+      showDayUpdate(showDayPool[theDay]);
+    });
+  } else {
+    showDayUpdate(showDayPool[theDay]);
+  }
 }
 
 var today = new Date();
