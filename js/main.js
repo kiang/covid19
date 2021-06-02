@@ -498,6 +498,20 @@ $('a#btn-Next').click(function (e) {
       ymd.d = '0' + ymd.d;
     }
     showDay('' + ymd.y + ymd.m + ymd.d);
+  } else {
+    newDay.setTime(dayBegin.getTime());
+    var ymd = {
+      y: newDay.getFullYear(),
+      m: newDay.getMonth() + 1,
+      d: newDay.getDate()
+    };
+    if (ymd.m < 10) {
+      ymd.m = '0' + ymd.m;
+    }
+    if (ymd.d < 10) {
+      ymd.d = '0' + ymd.d;
+    }
+    showDay('' + ymd.y + ymd.m + ymd.d);
   }
 });
 
@@ -515,4 +529,27 @@ $('a#btn-rateBased').click(function (e) {
   city.getSource().refresh();
   $('a#btn-countBased').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-rateBased').removeClass('btn-secondary').addClass('btn-primary');
+});
+
+var dataPlaying = false;
+$('a#btn-play').click(function(e) {
+  e.preventDefault();
+  dataPlaying = true;
+  $('a#btn-pause').removeClass('btn-primary').addClass('btn-secondary');
+  $('a#btn-play').removeClass('btn-secondary').addClass('btn-primary');
+  if(dataPlaying) {
+    $('a#btn-Next').trigger('click');
+    setTimeout(function() {
+      if(dataPlaying) {
+        $('a#btn-play').trigger('click');
+      }
+    }, 1000);
+  }
+});
+
+$('a#btn-pause').click(function(e) {
+  e.preventDefault();
+  dataPlaying = false;
+  $('a#btn-play').removeClass('btn-primary').addClass('btn-secondary');
+  $('a#btn-pause').removeClass('btn-secondary').addClass('btn-primary');
 });
