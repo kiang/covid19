@@ -226,7 +226,8 @@ function cityStyle(f) {
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
   var keyRate = 0.0;
-  if(mapStyle === 'countBased') {
+
+  if (mapStyle === 'countBased') {
     if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
       keyRate = cityMeta[cityKey].rate;
     }
@@ -239,8 +240,9 @@ function cityStyle(f) {
     } else if (keyRate > 0) {
       color = 'rgba(254,217,142,0.6)';
     }
+
   } else {
-    if(cityMeta[cityKey]) {
+    if (cityMeta[cityKey]) {
       keyRate = cityMeta[cityKey].increaseRate;
     }
     if (keyRate > 0.9) {
@@ -268,10 +270,19 @@ function cityStyle(f) {
       })
     })
   });
-  if (cityMeta[cityKey]) {
-    baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + keyRate.toString() + ')');
+
+  if (mapStyle === 'countBased') {
+    if (cityMeta[cityKey]) {
+      baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + keyRate.toString() + ')');
+    } else {
+      baseStyle.getText().setText(p.TOWNNAME + ' 0');
+    }
   } else {
-    baseStyle.getText().setText(p.TOWNNAME + ' 0');
+    if (cityMeta[cityKey] && cityMeta[cityKey].increase) {
+      baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].increase.toString() + "\n(" + keyRate.toString() + ')');
+    } else {
+      baseStyle.getText().setText(p.TOWNNAME + ' 0');
+    }
   }
   return baseStyle;
 }
@@ -384,7 +395,8 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
         confirmed: c[c1][c2],
         population: 0,
         rate: 0.0,
-        increaseRate: r.rate[c1][c2],
+        increaseRate: parseFloat(r.rate[c1][c2]),
+        increase: r.increase[c1][c2],
       };
     }
   }
@@ -444,8 +456,12 @@ function showDay(theDay) {
             }
             break;
         }
+        if(!cityMeta[cityKey]) {
+          cityMeta[cityKey] = {};
+        }
         cityMeta[cityKey].confirmed = c[c1][c2];
         cityMeta[cityKey].increaseRate = r.rate[c1][c2];
+        cityMeta[cityKey].increase = r.increase[c1][c2];
         cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
         city.getSource().refresh();
       }
@@ -496,7 +512,7 @@ $('a#btn-Next').click(function (e) {
   }
 });
 
-$('a#btn-countBased').click(function(e) {
+$('a#btn-countBased').click(function (e) {
   e.preventDefault();
   mapStyle = 'countBased';
   city.getSource().refresh();
@@ -504,7 +520,7 @@ $('a#btn-countBased').click(function(e) {
   $('a#btn-rateBased').removeClass('btn-primary').addClass('btn-secondary');
 });
 
-$('a#btn-rateBased').click(function(e) {
+$('a#btn-rateBased').click(function (e) {
   e.preventDefault();
   mapStyle = 'rateBased';
   city.getSource().refresh();
