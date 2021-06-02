@@ -58,7 +58,7 @@ var map = new ol.Map({
 
 map.addControl(sidebar);
 var pointClicked = false;
-var odPool = {};
+var townPool = {};
 map.on('singleclick', function (evt) {
   pointClicked = false;
   map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
@@ -95,9 +95,9 @@ map.on('singleclick', function (evt) {
           currentFeature.setStyle(cityStyle);
           lastFeatureType = 'area';
 
-          if (!odPool[cityKey]) {
-            $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + odKeys[cityKey] + '.json', {}, function (r) {
-              odPool[cityKey] = r;
+          if (!townPool[cityKey]) {
+            $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + townKeys[cityKey] + '.json', {}, function (r) {
+              townPool[cityKey] = r;
               showOdCharts(cityKey);
             });
           } else {
@@ -136,15 +136,15 @@ function showOdCharts(cityKey) {
     ageSeries: [],
   };
   var skipCount = 40;
-  for (k in odPool[cityKey]['days']) {
+  for (k in townPool[cityKey]['days']) {
     if (--skipCount < 0) {
       chartDataPool.categories.push(k.substring(4));
-      chartDataPool.data.push(odPool[cityKey]['days'][k]);
+      chartDataPool.data.push(townPool[cityKey]['days'][k]);
     }
   }
-  for (k in odPool[cityKey]['age']) {
+  for (k in townPool[cityKey]['age']) {
     chartDataPool.ageKey.push(k);
-    chartDataPool.ageSeries.push(odPool[cityKey]['age'][k]);
+    chartDataPool.ageSeries.push(townPool[cityKey]['age'][k]);
   }
   chart1 = new ApexCharts(document.querySelector('#odChart1'), {
     chart: {
@@ -166,7 +166,7 @@ function showOdCharts(cityKey) {
     chart: {
       type: 'pie'
     },
-    series: [odPool[cityKey].gender.m, odPool[cityKey].gender.f],
+    series: [townPool[cityKey].gender.m, townPool[cityKey].gender.f],
     labels: ['男', '女']
   });
   chart2.render();
@@ -285,7 +285,7 @@ function cityStyle(f) {
       baseStyle.getText().setText(p.TOWNNAME + ' 0');
     }
   } else {
-    if(keyRate != 0) {
+    if (keyRate != 0) {
       baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].increase.toString() + "\n(" + keyRate.toString() + ')');
     } else {
       baseStyle.getText().setText(p.TOWNNAME + ' 0');
@@ -359,7 +359,7 @@ $('#btn-pointShow').click(function () {
   vectorPoints.getSource().refresh();
 });
 
-var odKeys = [];
+var townKeys = {};
 var currentDay = '';
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
@@ -399,7 +399,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
           }
           break;
       }
-      odKeys[cityKey] = c1 + c2;
+      townKeys[cityKey] = c1 + c2;
       cityMeta[cityKey] = {
         confirmed: c[c1][c2],
         population: 0,
@@ -467,7 +467,7 @@ function showDay(theDay) {
             }
             break;
         }
-        if(!cityMeta[cityKey]) {
+        if (!cityMeta[cityKey]) {
           cityMeta[cityKey] = {};
         }
         cityMeta[cityKey].confirmed = c[c1][c2];
