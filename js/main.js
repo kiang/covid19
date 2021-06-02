@@ -285,7 +285,7 @@ function cityStyle(f) {
       baseStyle.getText().setText(p.TOWNNAME + ' 0');
     }
   } else {
-    if (cityMeta[cityKey] && cityMeta[cityKey].increase) {
+    if(keyRate != 0) {
       baseStyle.getText().setText(p.TOWNNAME + ' ' + cityMeta[cityKey].increase.toString() + "\n(" + keyRate.toString() + ')');
     } else {
       baseStyle.getText().setText(p.TOWNNAME + ' 0');
