@@ -356,6 +356,7 @@ var odKeys = [];
 var currentDay = '';
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
+  $('span#metaDay').html(r.meta.day);
   $('span#metaModified').html(r.meta.modified);
   currentDay = r.meta.day;
   var c = r.data;
