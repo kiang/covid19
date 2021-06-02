@@ -32,12 +32,18 @@ var vectorPoints = new ol.layer.Vector({
   zIndex: 100
 });
 
+var attribution = new ol.control.Attribution({
+  collapsible: false,
+  collapsed: true
+});
+
 var city = new ol.layer.Vector({
   source: new ol.source.Vector({
     url: 'https://kiang.github.io/taiwan_basecode/city/city.topo.json',
     format: new ol.format.TopoJSON({
       featureProjection: appView.getProjection()
-    })
+    }),
+    attributions: '<span id="mapDataDay">mapDataDay</span>'
   }),
   style: cityStyle,
   zIndex: 50
@@ -46,7 +52,8 @@ var city = new ol.layer.Vector({
 var map = new ol.Map({
   layers: [city, vectorPoints],
   target: 'map',
-  view: appView
+  view: appView,
+  controls: ol.control.defaults({ attribution: false }).extend([attribution])
 });
 
 map.addControl(sidebar);
@@ -357,6 +364,7 @@ var currentDay = '';
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   $('span#metaTotal').html(r.meta.total);
   $('span#metaDay').html(r.meta.day);
+  $('span#mapDataDay').html(r.meta.day);
   $('span#metaModified').html(r.meta.modified);
   currentDay = r.meta.day;
   var c = r.data;
@@ -422,6 +430,8 @@ function showDay(theDay) {
       cityMeta[k].rate = 0.0;
       cityMeta[k].increaseRate = 0.0;
     }
+    $('span#metaDay').html(r.meta.day);
+    $('span#mapDataDay').html(r.meta.day);
     $('span#metaTotal').html(r.meta.total);
     $('span#metaModified').html(r.meta.modified);
     currentDay = r.meta.day;
