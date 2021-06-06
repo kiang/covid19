@@ -449,9 +449,11 @@ function showDayUpdate(r) {
 function showDay(theDay) {
   $('#showingDay').html(theDay);
   if(!showDayPool[theDay]) {
-    $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
+    $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
       showDayPool[r.meta.day] = r;
       showDayUpdate(showDayPool[r.meta.day]);
+    }).fail(function() {
+      dayEnd.setTime(dayEnd.getTime() - 86400000);
     });
   } else {
     showDayUpdate(showDayPool[theDay]);
@@ -466,18 +468,7 @@ $('a#btn-Previous').click(function (e) {
   var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
   var newDay = new Date(cDay.getTime() - 86400000);
   if (newDay.getTime() > dayBegin.getTime()) {
-    var ymd = {
-      y: newDay.getFullYear(),
-      m: newDay.getMonth() + 1,
-      d: newDay.getDate()
-    };
-    if (ymd.m < 10) {
-      ymd.m = '0' + ymd.m;
-    }
-    if (ymd.d < 10) {
-      ymd.d = '0' + ymd.d;
-    }
-    showDay('' + ymd.y + ymd.m + ymd.d);
+    showDay(getYMD(newDay));
   }
 });
 
@@ -486,34 +477,27 @@ $('a#btn-Next').click(function (e) {
   var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
   var newDay = new Date(cDay.getTime() + 86400000);
   if (newDay.getTime() < dayEnd.getTime()) {
-    var ymd = {
-      y: newDay.getFullYear(),
-      m: newDay.getMonth() + 1,
-      d: newDay.getDate()
-    };
-    if (ymd.m < 10) {
-      ymd.m = '0' + ymd.m;
-    }
-    if (ymd.d < 10) {
-      ymd.d = '0' + ymd.d;
-    }
-    showDay('' + ymd.y + ymd.m + ymd.d);
+    showDay(getYMD(newDay));
   } else {
     newDay.setTime(dayBegin.getTime());
-    var ymd = {
-      y: newDay.getFullYear(),
-      m: newDay.getMonth() + 1,
-      d: newDay.getDate()
-    };
-    if (ymd.m < 10) {
-      ymd.m = '0' + ymd.m;
-    }
-    if (ymd.d < 10) {
-      ymd.d = '0' + ymd.d;
-    }
-    showDay('' + ymd.y + ymd.m + ymd.d);
+    showDay(getYMD(newDay));
   }
 });
+
+function getYMD(theTime) {
+  var ymd = {
+    y: theTime.getFullYear(),
+    m: theTime.getMonth() + 1,
+    d: theTime.getDate()
+  };
+  if (ymd.m < 10) {
+    ymd.m = '0' + ymd.m;
+  }
+  if (ymd.d < 10) {
+    ymd.d = '0' + ymd.d;
+  }
+  return '' + ymd.y + ymd.m + ymd.d;
+}
 
 $('a#btn-countBased').click(function (e) {
   e.preventDefault();
