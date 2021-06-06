@@ -440,10 +440,10 @@ function showDayUpdate(r) {
       cityMeta[cityKey].increaseRate = r.rate[c1][c2];
       cityMeta[cityKey].increase = r.increase[c1][c2];
       cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
-      if(populationDone) {
-        city.getSource().refresh();
-      }
     }
+  }
+  if(populationDone) {
+    city.getSource().refresh();
   }
 }
 function showDay(theDay) {
