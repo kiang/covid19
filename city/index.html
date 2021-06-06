@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta property="og:title" content="台灣 Covid-19 本土病例地圖(縣市)">
+    <meta property="og:description" content="台灣 Covid-19 本土病例地圖(縣市)">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://kiang.github.io/covid19/og_image.png">
+    <title>台灣 Covid-19 本土病例地圖(縣市)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/ol.css" type="text/css">
+    <link rel="stylesheet" href="../css/ol3-sidebar.min.css" type="text/css" />
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+            font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+        }
+
+        .lorem {
+            font-style: italic;
+            color: #AAA;
+        }
+
+        .ui-front {
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v2.12&appId=1393405437614114&autoLogAppEvents=1';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+                <li><a href="#book" role="tab"><i class="fa fa-book"></i></a></li>
+                <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+                <li><a href="https://github.com/kiang/covid19" role="tab" target="_blank"><i
+                            class="fa fa-github"></i></a></li>
+                <li><a href="#fb" role="tab"><i class="fa fa-facebook"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content">
+            <div class="sidebar-pane" id="home">
+                <h1 class="sidebar-header"><span id="sidebarTitle">請點選地圖中的點</span><span class="sidebar-close"><i
+                            class="fa fa-caret-left"></i></span></h1>
+                <div id="sidebarContent">請點選地圖中的點</div>
+                <hr />
+                <div id="odChart1"></div>
+                <div id="odChart2"></div>
+                <div id="odChart3"></div>
+                <div>
+                    <table class="table table-dark">
+                        <tbody>
+                            <tr>
+                                <th scope="row" colspan="2" style="text-align: center;">系統摘要</th>
+                            </tr>
+                            <tr>
+                                <th scope="row">資料時間</th>
+                                <td><span id="metaDay"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">全國總數</th>
+                                <td><span id="metaTotal"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">異動時間</th>
+                                <td><span id="metaModified"></span></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">說明</th>
+                                <td>
+                                    <ul>
+                                        <li>本系統只有顯示 2021 以來病例數</li>
+                                        <li>數字一般會比指揮中心通報延遲一天</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr />
+                <div class="btn-group-vertical" role="group" style="width: 100%;">
+                    <a href="https://github.com/kiang/covid19/issues" target="_blank"
+                        class="btn btn-primary btn-lg btn-block">網站問題反應</a>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="book">
+                <h1 class="sidebar-header"><span id="weekTitle">說明</span><span class="sidebar-close"><i
+                            class="fa fa-caret-left"></i></span></h1>
+                <div>
+                    資料來源：
+                    <ul>
+                        <li><a href="https://nidss.cdc.gov.tw/nndss/disease?id=19cov" target="_blank">傳染病統計資料查詢系統</a>
+                        </li>
+                    </ul>
+                    * 資料每天更新
+                </div>
+            </div>
+            <div class="sidebar-pane" id="settings">
+                <h1 class="sidebar-header"><span id="weekTitle">設定</span><span class="sidebar-close"><i
+                            class="fa fa-caret-left"></i></span></h1>
+                <div>
+                    <a href="#" class="btn btn-primary btn-lg btn-block" id="btn-geolocation">回到目前位置</a>
+                    <p>
+                        <hr />
+                    </p>
+                </div>
+                <div class="btn-group btn-block">
+                    <a href="#" class="btn btn-primary btn-lg" id="btn-Previous"> &lt;&lt; 前一天</a>
+                    <a href="#" class="btn btn-primary btn-lg" id="btn-Next">後一天 &gt;&gt; </a>
+                </div>
+                <div id="showingDay"></div>
+                <hr />
+                <div class="btn-group btn-block">
+                    <a href="#" class="btn btn-secondary btn-lg" id="btn-play">播放</a>
+                    <a href="#" class="btn btn-primary btn-lg" id="btn-pause">暫停</a>
+                </div>
+                <hr />
+                <div class="btn-group btn-block">
+                    <a href="#" class="btn btn-primary btn-lg" id="btn-countBased">累積數</a>
+                    <a href="#" class="btn btn-secondary btn-lg" id="btn-rateBased">增加率</a>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="fb">
+                <div class="fb-page" data-href="https://www.facebook.com/k.olc.tw/" data-tabs="timeline"
+                    data-width="380" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false"
+                    data-show-facepile="true">
+                    <blockquote cite="https://www.facebook.com/k.olc.tw/" class="fb-xfbml-parse-ignore"><a
+                            href="https://www.facebook.com/k.olc.tw/">江明宗</a></blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map" class="sidebar-map"></div>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="../js/ol.js" type="text/javascript"></script>
+    <script src="../js/ol5-sidebar.min.js" type="text/javascript"></script>
+    <script src="../js/city_main.js" type="text/javascript"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNQTGESTW5"></script>
+    <script>
+        // window.dataLayer = window.dataLayer || [];
+        // function gtag() { dataLayer.push(arguments); }
+        // gtag('js', new Date());
+
+        // gtag('config', 'G-DNQTGESTW5');
+    </script>
+</body>
+
+</html>
