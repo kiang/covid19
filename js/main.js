@@ -450,8 +450,8 @@ function showDay(theDay) {
   $('#showingDay').html(theDay);
   if(!showDayPool[theDay]) {
     $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
-      showDayPool[theDay] = r;
-      showDayUpdate(showDayPool[theDay]);
+      showDayPool[r.meta.day] = r;
+      showDayUpdate(showDayPool[r.meta.day]);
     });
   } else {
     showDayUpdate(showDayPool[theDay]);
