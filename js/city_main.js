@@ -348,12 +348,6 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
 var showDayPool = {};
 var townPool = {};
 function showDayUpdate(r) {
-  for (k in cityMeta) {
-    cityMeta[k].confirmed = 0;
-    cityMeta[k].increase = 0;
-    cityMeta[k].rate = 0.0;
-    cityMeta[k].increaseRate = 0.0;
-  }
   $('span#metaDay').html(r.meta.day);
   $('span#mapDataDay').html(r.meta.day);
   $('span#metaTotal').html(r.meta.total);
@@ -391,26 +385,27 @@ function showDayUpdate(r) {
     if(!townPool[c1]) {
       townPool[c1] = {};
     }
+    cityMeta[cityKey].confirmed = 0;
+    cityMeta[cityKey].increase = 0;
+    cityMeta[cityKey].rate = 0.0;
+    cityMeta[cityKey].increaseRate = 0.0;
     
     for (c2 in c[c1]) {
       if(!townPool[c1][c2]) {
         townPool[c1][c2] = c1 + c2;
       }
       cityMeta[cityKey].confirmed += c[c1][c2];
-      if(r.increase[c1][c2]) {
-        cityMeta[cityKey].increase += r.increase[c1][c2];
-      }
-      if(cityMeta[cityKey].increase > 0) {
-        if(cityMeta[cityKey].increase < cityMeta[cityKey].confirmed) {
-          cityMeta[cityKey].increaseRate = Math.round(cityMeta[cityKey].increase / (cityMeta[cityKey].confirmed - cityMeta[cityKey].increase) * 100) / 100;
-        } else {
-          cityMeta[cityKey].increaseRate = 1.0;
-        }
-      }
-      if(cityMeta[cityKey].confirmed > 0) {
-        cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
+      cityMeta[cityKey].increase += r.increase[c1][c2];
+    }
+
+    if(cityMeta[cityKey].increase > 0) {
+      if(cityMeta[cityKey].increase < cityMeta[cityKey].confirmed) {
+        cityMeta[cityKey].increaseRate = Math.round(cityMeta[cityKey].increase / (cityMeta[cityKey].confirmed - cityMeta[cityKey].increase) * 100) / 100;
+      } else {
+        cityMeta[cityKey].increaseRate = 1.0;
       }
     }
+    cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
   }
   if (populationDone) {
     city.getSource().refresh();
