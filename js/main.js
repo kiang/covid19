@@ -367,7 +367,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
       if (cityMeta[c[code].area]) {
         cityMeta[c[code].area].population = c[code].population;
         if (cityMeta[c[code].area].confirmed > 0) {
-          cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 100000) / 10;
+          cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 1000000) / 100;
         }
       }
     }
@@ -435,7 +435,7 @@ function showDayUpdate(r) {
       cityMeta[cityKey].confirmed = c[c1][c2];
       cityMeta[cityKey].increaseRate = r.rate[c1][c2];
       cityMeta[cityKey].increase = r.increase[c1][c2];
-      cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 100000) / 10;
+      cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
     }
   }
   if(populationDone) {
