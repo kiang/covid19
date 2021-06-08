@@ -375,6 +375,12 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
 var showDayPool = {};
 var townPool = {};
 function showDayUpdate(r) {
+  for(k in cityMeta) {
+    cityMeta[k].confirmed = 0;
+    cityMeta[k].increase = 0;
+    cityMeta[k].rate = 0.0;
+    cityMeta[k].increaseRate = 0.0;
+  }
   $('span#metaDay').html(r.meta.day);
   $('span#mapDataDay').html(r.meta.day);
   $('span#metaTotal').html(r.meta.total);
@@ -412,10 +418,6 @@ function showDayUpdate(r) {
     if(!townPool[c1]) {
       townPool[c1] = {};
     }
-    cityMeta[cityKey].confirmed = 0;
-    cityMeta[cityKey].increase = 0;
-    cityMeta[cityKey].rate = 0.0;
-    cityMeta[cityKey].increaseRate = 0.0;
     
     for (c2 in c[c1]) {
       if(!townPool[c1][c2]) {
