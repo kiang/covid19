@@ -226,7 +226,7 @@ function pointStyle(f) {
 var mapStyle = 'countBased';
 function cityStyle(f) {
   var p = f.getProperties();
-  var color = 'rgba(255,255,255,0.5)';
+  var color = '#ffffff';
   var strokeWidth = 1;
   if (f === currentFeature) {
     strokeWidth = 5;
@@ -238,29 +238,25 @@ function cityStyle(f) {
     if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
       keyRate = cityMeta[cityKey].rate;
     }
-    if (keyRate > 10) {
-      color = 'rgba(153,52,4,0.6)';
-    } else if (keyRate > 5) {
-      color = 'rgba(217,95,14,0.6)';
-    } else if (keyRate > 1) {
-      color = 'rgba(254,153,41,0.6)';
-    } else if (keyRate > 0) {
-      color = 'rgba(254,217,142,0.6)';
-    }
-
   } else {
     if (cityMeta[cityKey]) {
       keyRate = cityMeta[cityKey].increaseRate;
     }
-    if (keyRate > 0.9) {
-      color = 'rgba(153,52,4,0.6)';
-    } else if (keyRate > 0.5) {
-      color = 'rgba(217,95,14,0.6)';
-    } else if (keyRate > 0.2) {
-      color = 'rgba(254,153,41,0.6)';
-    } else if (keyRate > 0) {
-      color = 'rgba(254,217,142,0.6)';
-    }
+  }
+  if (keyRate > 50) {
+    color = '#a35805';
+  } else if (keyRate > 20) {
+    color = '#c46a05';
+  } else if (keyRate > 10) {
+    color = '#e67c05';
+  } else if (keyRate > 5) {
+    color = '#fa8d13';
+  } else if (keyRate > 3) {
+    color = '#fc9d34';
+  } else if (keyRate > 1) {
+    color = '#fdad55';
+  } else if (keyRate > 0) {
+    color = '#febd76';
   }
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
