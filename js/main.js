@@ -134,10 +134,28 @@ function showOdCharts(cityKey) {
     categories: [],
     ageKey: [],
     ageSeries: [],
+    countAvg: [],
   };
   var skipCount = 40;
   for (k in townPool[cityKey]['days']) {
     if (--skipCount < 0) {
+      var ymd = {
+        y: k.substring(0, 4),
+        m: k.substring(4, 6),
+        d: k.substring(6, 8),
+      };
+      var theDay = new Date(ymd.y, parseInt(ymd.m) - 1, ymd.d);
+      var prevDay = new Date();
+      var sumDay = townPool[cityKey]['days'][k];
+      prevDay.setTime(theDay.getTime() - 86400000);
+      for(i = 0; i < 6; i++) {
+        var prevKey = getYMD(prevDay);
+        if(townPool[cityKey]['days'][prevKey]) {
+          sumDay += townPool[cityKey]['days'][prevKey];
+        }
+        prevDay.setTime(prevDay.getTime() - 86400000);
+      }
+      chartDataPool.countAvg.push(Math.round(sumDay / 7));
       chartDataPool.categories.push(k.substring(4));
       chartDataPool.data.push(townPool[cityKey]['days'][k]);
     }
@@ -148,14 +166,27 @@ function showOdCharts(cityKey) {
   }
   chart1 = new ApexCharts(document.querySelector('#odChart1'), {
     chart: {
-      type: 'bar'
+      height: 300,
+      type: 'line'
     },
     series: [
       {
         name: '確診人數',
+        type: 'column',
         data: chartDataPool.data
+      },
+      {
+        name: '7日平均',
+        type: 'line',
+        data: chartDataPool.countAvg,
       }
     ],
+    stroke: {
+      width: [0, 3]
+    },
+    title: {
+      text: '每日確診'
+    },
     xaxis: {
       categories: chartDataPool.categories
     }
