@@ -411,6 +411,7 @@ var showDayPool = {};
 function showDayUpdate(r) {
   for (k in cityMeta) {
     cityMeta[k].confirmed = 0;
+    cityMeta[k].increase = 0;
     cityMeta[k].rate = 0.0;
     cityMeta[k].increaseRate = 0.0;
   }
