@@ -244,19 +244,19 @@ function cityStyle(f) {
     }
   }
   if (keyRate > 50) {
-    color = '#a35805';
+    color = '#470115';
   } else if (keyRate > 20) {
-    color = '#c46a05';
+    color = '#6f006d';
   } else if (keyRate > 10) {
-    color = '#e67c05';
+    color = '#a4005b';
   } else if (keyRate > 5) {
-    color = '#fa8d13';
+    color = '#d00b33';
   } else if (keyRate > 3) {
-    color = '#fc9d34';
+    color = '#e75033';
   } else if (keyRate > 1) {
-    color = '#fdad55';
+    color = '#ffa133';
   } else if (keyRate > 0) {
-    color = '#febd76';
+    color = '#e3d738';
   }
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
@@ -269,7 +269,7 @@ function cityStyle(f) {
     text: new ol.style.Text({
       font: '14px "Open Sans", "Arial Unicode MS", "sans-serif"',
       fill: new ol.style.Fill({
-        color: 'rgba(176,0,25,1)'
+        color: '#388ae3'
       })
     })
   });
