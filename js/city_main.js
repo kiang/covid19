@@ -143,7 +143,7 @@ function showOdCharts(cityKey) {
     ageSeries: [],
     countAvg: [],
   };
-  var skipCount = 40;
+  var skipCount = 20;
   for (k in cityPool[cityKey]['days']) {
     if (--skipCount < 0) {
       var ymd = {
