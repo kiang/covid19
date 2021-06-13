@@ -240,30 +240,69 @@ function cityStyle(f) {
   var cityKey = p.COUNTYNAME;
   var keyRate = 0.0;
 
-  if (mapStyle === 'countBased') {
-    if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
-      keyRate = cityMeta[cityKey].rate;
-    }
-  } else {
-    if (cityMeta[cityKey]) {
-      keyRate = cityMeta[cityKey].increaseRate;
-    }
+  switch (mapStyle) {
+    case 'countBased':
+      if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
+        keyRate = cityMeta[cityKey].rate;
+      }
+      if (keyRate > 50) {
+        color = '#470115';
+      } else if (keyRate > 20) {
+        color = '#6f006d';
+      } else if (keyRate > 10) {
+        color = '#a4005b';
+      } else if (keyRate > 5) {
+        color = '#d00b33';
+      } else if (keyRate > 3) {
+        color = '#e75033';
+      } else if (keyRate > 1) {
+        color = '#ffa133';
+      } else if (keyRate > 0) {
+        color = '#e3d738';
+      }
+      break;
+    case 'rateBased':
+      if (cityMeta[cityKey]) {
+        keyRate = cityMeta[cityKey].increaseRate;
+      }
+      if (keyRate > 50) {
+        color = '#470115';
+      } else if (keyRate > 20) {
+        color = '#6f006d';
+      } else if (keyRate > 10) {
+        color = '#a4005b';
+      } else if (keyRate > 5) {
+        color = '#d00b33';
+      } else if (keyRate > 3) {
+        color = '#e75033';
+      } else if (keyRate > 1) {
+        color = '#ffa133';
+      } else if (keyRate > 0) {
+        color = '#e3d738';
+      }
+      break;
+    case 'avgBased':
+      if (cityMeta[cityKey]) {
+        keyRate = cityMeta[cityKey].avg7;
+      }
+      if (keyRate > 50) {
+        color = '#470115';
+      } else if (keyRate > 20) {
+        color = '#6f006d';
+      } else if (keyRate > 10) {
+        color = '#a4005b';
+      } else if (keyRate > 5) {
+        color = '#d00b33';
+      } else if (keyRate > 3) {
+        color = '#e75033';
+      } else if (keyRate > 1) {
+        color = '#ffa133';
+      } else if (keyRate > 0) {
+        color = '#e3d738';
+      }
+      break;
   }
-  if (keyRate > 50) {
-    color = '#470115';
-  } else if (keyRate > 20) {
-    color = '#6f006d';
-  } else if (keyRate > 10) {
-    color = '#a4005b';
-  } else if (keyRate > 5) {
-    color = '#d00b33';
-  } else if (keyRate > 3) {
-    color = '#e75033';
-  } else if (keyRate > 1) {
-    color = '#ffa133';
-  } else if (keyRate > 0) {
-    color = '#e3d738';
-  }
+
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: 'rgba(0,0,0,0.8)',
@@ -280,18 +319,28 @@ function cityStyle(f) {
     })
   });
 
-  if (mapStyle === 'countBased') {
-    if (cityMeta[cityKey]) {
-      baseStyle.getText().setText(p.COUNTYNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + keyRate.toString() + ')');
-    } else {
-      baseStyle.getText().setText(p.COUNTYNAME + ' 0');
-    }
-  } else {
-    if (keyRate != 0) {
-      baseStyle.getText().setText(p.COUNTYNAME + ' ' + cityMeta[cityKey].increase.toString() + "\n(" + keyRate.toString() + ')');
-    } else {
-      baseStyle.getText().setText(p.COUNTYNAME + ' 0');
-    }
+  switch (mapStyle) {
+    case 'countBased':
+      if (cityMeta[cityKey]) {
+        baseStyle.getText().setText(p.COUNTYNAME + ' ' + cityMeta[cityKey].confirmed.toString() + "\n(" + keyRate.toString() + ')');
+      } else {
+        baseStyle.getText().setText(p.COUNTYNAME + ' 0');
+      }
+      break;
+    case 'rateBased':
+      if (keyRate != 0) {
+        baseStyle.getText().setText(p.COUNTYNAME + ' ' + cityMeta[cityKey].increase.toString() + "\n(" + keyRate.toString() + ')');
+      } else {
+        baseStyle.getText().setText(p.COUNTYNAME + ' 0');
+      }
+      break;
+    case 'avgBased':
+      if (keyRate != 0) {
+        baseStyle.getText().setText(p.COUNTYNAME + ' ' + cityMeta[cityKey].avg7.toString() + "\n(" + keyRate.toString() + ')');
+      } else {
+        baseStyle.getText().setText(p.COUNTYNAME + ' 0');
+      }
+      break;
   }
   return baseStyle;
 }
@@ -380,6 +429,7 @@ function showDayUpdate(r) {
     cityMeta[k].increase = 0;
     cityMeta[k].rate = 0.0;
     cityMeta[k].increaseRate = 0.0;
+    cityMeta[k].avg7 = 0.0;
   }
   $('span#metaDay').html(r.meta.day);
   $('span#mapDataDay').html(r.meta.day);
@@ -413,18 +463,23 @@ function showDayUpdate(r) {
         rate: 0.0,
         increaseRate: 0.0,
         increase: 0,
+        avg7: 0.0,
       };
     }
     if(!townPool[c1]) {
       townPool[c1] = {};
     }
-    
+
+    var avg7Sum = 0;
     for (c2 in c[c1]) {
       if(!townPool[c1][c2]) {
         townPool[c1][c2] = c1 + c2;
       }
       cityMeta[cityKey].confirmed += c[c1][c2];
       cityMeta[cityKey].increase += r.increase[c1][c2];
+      if (r.avg7 && r.avg7[c1] && r.avg7[c1][c2]) {
+        avg7Sum += r.avg7[c1][c2] * 7;
+      }
     }
 
     if(cityMeta[cityKey].increase > 0) {
@@ -435,6 +490,8 @@ function showDayUpdate(r) {
       }
     }
     cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
+    cityMeta[cityKey].avg7 = Math.round(avg7Sum / 7);
+    
   }
   if (populationDone) {
     city.getSource().refresh();
@@ -497,16 +554,24 @@ $('a#btn-countBased').click(function (e) {
   e.preventDefault();
   mapStyle = 'countBased';
   city.getSource().refresh();
+  $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-countBased').removeClass('btn-secondary').addClass('btn-primary');
-  $('a#btn-rateBased').removeClass('btn-primary').addClass('btn-secondary');
 });
 
 $('a#btn-rateBased').click(function (e) {
   e.preventDefault();
   mapStyle = 'rateBased';
   city.getSource().refresh();
-  $('a#btn-countBased').removeClass('btn-primary').addClass('btn-secondary');
+  $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-rateBased').removeClass('btn-secondary').addClass('btn-primary');
+});
+
+$('a#btn-avgBased').click(function (e) {
+  e.preventDefault();
+  mapStyle = 'avgBased';
+  city.getSource().refresh();
+  $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
+  $('a#btn-avgBased').removeClass('btn-secondary').addClass('btn-primary');
 });
 
 var dataPlaying = false;
