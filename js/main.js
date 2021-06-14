@@ -259,8 +259,10 @@ function cityStyle(f) {
   var p = f.getProperties();
   var color = '#ffffff';
   var strokeWidth = 1;
+  var strokeColor = 'rgba(0,0,0,0.3)';
   if (f === currentFeature) {
-    strokeWidth = 5;
+    strokeColor = 'rgba(0,0,0,1)';
+    strokeWidth = 2;
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
   var keyRate = 0.0;
@@ -330,7 +332,7 @@ function cityStyle(f) {
 
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
-      color: 'rgba(0,0,0,0.8)',
+      color: strokeColor,
       width: strokeWidth
     }),
     fill: new ol.style.Fill({
