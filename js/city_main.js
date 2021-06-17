@@ -239,6 +239,7 @@ function cityStyle(f) {
   }
   var cityKey = p.COUNTYNAME;
   var keyRate = 0.0;
+  var textColor = '#000000';
 
   switch (mapStyle) {
     case 'countBased':
@@ -303,6 +304,10 @@ function cityStyle(f) {
       break;
   }
 
+  if(keyRate > 5) {
+    textColor = '#ffffff';
+  }
+
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: 'rgba(0,0,0,0.8)',
@@ -314,7 +319,7 @@ function cityStyle(f) {
     text: new ol.style.Text({
       font: '14px "Open Sans", "Arial Unicode MS", "sans-serif"',
       fill: new ol.style.Fill({
-        color: '#388ae3'
+        color: textColor
       })
     })
   });
