@@ -192,7 +192,7 @@ function showOdCharts(cityKey) {
       width: [0, 3]
     },
     title: {
-      text: '每日確診'
+      text: '每日確診(發病日)'
     },
     xaxis: {
       categories: chartDataPool.categories
