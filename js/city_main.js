@@ -408,15 +408,20 @@ $('#btn-geolocation').click(function () {
 var cityKeys = {};
 var currentDay = '';
 var populationDone = false;
+var populationPool = {};
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
   $.get('https://kiang.github.io/tw_population/json/city/2021/04.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
+      if(!populationPool[cityKey]) {
+        populationPool[cityKey] = 0;
+      }
+      populationPool[cityKey] += c[code].population;
       if (cityMeta[cityKey]) {
         cityMeta[cityKey].population += c[code].population;
-        if (cityMeta[cityKey].confirmed > 0) {
+        if (cityMeta[cityKey].confirmed > 0 && cityMeta[cityKey].population > 0) {
           cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
         }
       }
@@ -470,6 +475,9 @@ function showDayUpdate(r) {
         increase: 0,
         avg7: 0.0,
       };
+      if(populationPool[cityKey]) {
+        cityMeta[cityKey].population = populationPool[cityKey];
+      }
     }
     if(!townPool[c1]) {
       townPool[c1] = {};
@@ -494,7 +502,9 @@ function showDayUpdate(r) {
         cityMeta[cityKey].increaseRate = 1.0;
       }
     }
-    cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
+    if(cityMeta[cityKey].population > 0) {
+      cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
+    }
     cityMeta[cityKey].avg7 = Math.round(avg7Sum / 7);
     
   }
