@@ -476,7 +476,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
       return b.rate - a.rate;
     });
     let listTable = '<table class="table table-bordered">';
-    listTable += '<tr><th>區域</th><th>比率</th><th>確診數</th></tr>';
+    listTable += '<tr><th>區域</th><th>每萬人口比率</th><th>確診數</th></tr>';
     for(k in rateList) {
       listTable += '<tr>';
       listTable += '<td>' + rateList[k].area + '</td>';
