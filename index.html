@@ -57,6 +57,7 @@
                 <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
                 <li><a href="#book" role="tab"><i class="fa fa-book"></i></a></li>
                 <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+                <li><a href="#list" role="tab"><i class="fa fa-tree"></i></a></li>
                 <li><a href="https://github.com/kiang/covid19" role="tab" target="_blank"><i
                             class="fa fa-github"></i></a></li>
                 <li><a href="#fb" role="tab"><i class="fa fa-facebook"></i></a></li>
@@ -118,7 +119,7 @@
                 </div>
             </div>
             <div class="sidebar-pane" id="book">
-                <h1 class="sidebar-header"><span id="weekTitle">說明</span><span class="sidebar-close"><i
+                <h1 class="sidebar-header"><span>說明</span><span class="sidebar-close"><i
                             class="fa fa-caret-left"></i></span></h1>
                 <div>
                     相關介紹：
@@ -157,7 +158,7 @@
                 </div>
             </div>
             <div class="sidebar-pane" id="settings">
-                <h1 class="sidebar-header"><span id="weekTitle">設定</span><span class="sidebar-close"><i
+                <h1 class="sidebar-header"><span>設定</span><span class="sidebar-close"><i
                             class="fa fa-caret-left"></i></span></h1>
                 <div>
                     <a href="#" class="btn btn-primary btn-lg btn-block" id="btn-geolocation">回到目前位置</a>
@@ -182,6 +183,11 @@
                     <a href="#" class="btn btn-secondary btn-lg btn-switch" id="btn-rateBased">增加率</a>
                     <a href="#" class="btn btn-secondary btn-lg btn-switch" id="btn-avgBased">7日平均</a>
                 </div>
+            </div>
+            <div class="sidebar-pane" id="list">
+                <h1 class="sidebar-header"><span>萬人確診率排行</span><span class="sidebar-close"><i
+                    class="fa fa-caret-left"></i></span></h1>
+                <div id="listContent"></div>
             </div>
             <div class="sidebar-pane" id="fb">
                 <div class="fb-page" data-href="https://www.facebook.com/k.olc.tw/" data-tabs="timeline"

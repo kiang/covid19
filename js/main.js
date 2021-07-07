@@ -446,6 +446,7 @@ var townKeys = {};
 var currentDay = '';
 var populationDone = false;
 var populationPool = {};
+var rateList = [];
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
@@ -457,9 +458,34 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, f
         cityMeta[c[code].area].population = c[code].population;
         if (cityMeta[c[code].area].confirmed > 0 && cityMeta[c[code].area].population > 0) {
           cityMeta[c[code].area].rate = Math.round(cityMeta[c[code].area].confirmed / cityMeta[c[code].area].population * 1000000) / 100;
+          rateList.push({
+            area: c[code].area,
+            rate: cityMeta[c[code].area].rate,
+            cases: cityMeta[c[code].area].confirmed
+          });
+        } else {
+          rateList.push({
+            area: c[code].area,
+            rate: 0.0,
+            cases: 0
+          });
         }
       }
     }
+    rateList.sort(function(a, b) {
+      return b.rate - a.rate;
+    });
+    let listTable = '<table class="table table-bordered">';
+    listTable += '<tr><th>區域</th><th>比率</th><th>確診數</th></tr>';
+    for(k in rateList) {
+      listTable += '<tr>';
+      listTable += '<td>' + rateList[k].area + '</td>';
+      listTable += '<td>' + rateList[k].rate + '</td>';
+      listTable += '<td>' + rateList[k].cases + '</td>';
+      listTable += '</tr>';
+    }
+    listTable += '</table>';
+    $('#listContent').html(listTable);
     populationDone = true;
     city.getSource().refresh();
   })
