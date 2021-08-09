@@ -433,6 +433,11 @@ $('#btn-geolocation').click(function () {
   return false;
 });
 
+$('#btn-taiwan').click(function () {
+  appView.setCenter(ol.proj.fromLonLat([120.221507, 23.000694]));
+  return false;
+});
+
 $('#btn-pointShow').click(function () {
   if (false === showPoints) {
     showPoints = true;
