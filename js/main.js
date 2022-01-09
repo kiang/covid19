@@ -452,7 +452,7 @@ var currentDay = '';
 var populationDone = false;
 var populationPool = {};
 var rateList = [];
-$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2021.json', {}, function (r) {
+$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2022.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
 
