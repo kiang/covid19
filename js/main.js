@@ -254,6 +254,43 @@ function pointStyle(f) {
   })
 }
 
+var colorTable = {
+  'countBased': [
+    [50, '#470115'],
+    [20, '#6f006d'],
+    [10, '#a4005b'],
+    [5, '#d00b33'],
+    [3, '#e75033'],
+    [1, '#ffa133'],
+    [0, '#e3d738']
+  ],
+  'rateBased': [
+    [20, '#470115'],
+    [10, '#6f006d'],
+    [5, '#a4005b'],
+    [2, '#d00b33'],
+    [0.5, '#e75033'],
+    [0.2, '#ffa133'],
+    [0, '#e3d738']
+  ],
+  'avgBased': [
+    [50, '#470115'],
+    [20, '#6f006d'],
+    [10, '#a4005b'],
+    [5, '#d00b33'],
+    [3, '#e75033'],
+    [1, '#ffa133'],
+    [0, '#e3d738']
+  ]
+};
+function updateColorTable() {
+  var tableLines = '';
+  for(k in colorTable[mapStyle]) {
+    tableLines += '<tr><td style="background-color: ' + colorTable[mapStyle][k][1] + '">&nbsp;&nbsp;</td><td> &gt;' + colorTable[mapStyle][k][0] + '</td></tr>';
+  }
+  $('table#colorTable').html(tableLines);
+}
+
 var mapStyle = 'countBased';
 function cityStyle(f) {
   var p = f.getProperties();
@@ -273,62 +310,22 @@ function cityStyle(f) {
       if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
         keyRate = cityMeta[cityKey].rate;
       }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
-      }
       break;
     case 'rateBased':
       if (cityMeta[cityKey]) {
         keyRate = cityMeta[cityKey].increaseRate;
-      }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
       }
       break;
     case 'avgBased':
       if (cityMeta[cityKey]) {
         keyRate = cityMeta[cityKey].avg7;
       }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
-      }
       break;
+  }
+  for(k in colorTable[mapStyle]) {
+    if(color === '#ffffff' && keyRate > colorTable[mapStyle][k][0]) {
+      color = colorTable[mapStyle][k][1];
+    }
   }
 
   if(keyRate > 5) {
@@ -632,6 +629,7 @@ $('a#btn-countBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-countBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 $('a#btn-rateBased').click(function (e) {
@@ -640,6 +638,7 @@ $('a#btn-rateBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-rateBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 $('a#btn-avgBased').click(function (e) {
@@ -648,6 +647,7 @@ $('a#btn-avgBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-avgBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 var dataPlaying = false;
@@ -672,3 +672,5 @@ $('a#btn-pause').click(function (e) {
   $('a#btn-play').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-pause').removeClass('btn-secondary').addClass('btn-primary');
 });
+
+updateColorTable();
