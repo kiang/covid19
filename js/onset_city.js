@@ -72,19 +72,19 @@ map.on('singleclick', function (evt) {
       var message = '';
       if (p.COUNTYNAME) {
         var cityKey = p.COUNTYNAME;
+        sidebarTitle.innerHTML = p.COUNTYNAME;
+        currentFeature.setStyle(cityStyle);
         if (cityMeta[cityKey]) {
           message += '<table class="table table-dark"><tbody>';
           message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
           message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
           message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
           message += '</tbody></table>';
-          sidebarTitle.innerHTML = p.COUNTYNAME;
-          currentFeature.setStyle(cityStyle);
           var odCityKey = cityKeys[cityKey];
           loopingKey = cityKey;
           if (!cityPool[cityKey]) {
             currentTownCount[cityKey] = Object.keys(townPool[odCityKey]).length;
-            for(town in townPool[odCityKey]) {
+            for (town in townPool[odCityKey]) {
               $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/town/' + townPool[odCityKey][town] + '.json', {}, function (r) {
                 var cityKey = r.city;
                 switch (cityKey) {
@@ -101,20 +101,20 @@ map.on('singleclick', function (evt) {
                     cityKey = '臺東縣';
                     break;
                 }
-                if(!cityPool[cityKey]) {
+                if (!cityPool[cityKey]) {
                   cityPool[cityKey] = r;
                 } else {
-                  for(k in r.days) {
+                  for (k in r.days) {
                     cityPool[cityKey].days[k] += r.days[k];
                   }
-                  for(k in r.age) {
+                  for (k in r.age) {
                     cityPool[cityKey].age[k] += r.age[k];
                   }
-                  for(k in r.gender) {
+                  for (k in r.gender) {
                     cityPool[cityKey].gender[k] += r.gender[k];
                   }
                 }
-                if(--currentTownCount[cityKey] <= 0) {
+                if (--currentTownCount[cityKey] <= 0) {
                   showOdCharts(loopingKey);
                 }
               });
@@ -122,6 +122,12 @@ map.on('singleclick', function (evt) {
           } else {
             showOdCharts(cityKey);
           }
+        } else {
+          message += '<table class="table table-dark"><tbody>';
+          message += '<tr><th scope="row">確診數量</th><td>0</td></tr>';
+          message += '<tr><th scope="row">人口</th><td>' + populationPool[cityKey] + '</td></tr>';
+          message += '<tr><th scope="row">比率</th><td>0(每萬人口)</td></tr>';
+          message += '</tbody></table>';
         }
 
       }
@@ -155,9 +161,9 @@ function showOdCharts(cityKey) {
       var prevDay = new Date();
       var sumDay = cityPool[cityKey]['days'][k];
       prevDay.setTime(theDay.getTime() - 86400000);
-      for(i = 0; i < 6; i++) {
+      for (i = 0; i < 6; i++) {
         var prevKey = getYMD(prevDay);
-        if(cityPool[cityKey]['days'][prevKey]) {
+        if (cityPool[cityKey]['days'][prevKey]) {
           sumDay += cityPool[cityKey]['days'][prevKey];
         }
         prevDay.setTime(prevDay.getTime() - 86400000);
@@ -304,7 +310,7 @@ function cityStyle(f) {
       break;
   }
 
-  if(keyRate > 5) {
+  if (keyRate > 5) {
     textColor = '#ffffff';
   }
 
@@ -420,7 +426,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/2022.json', {}, funct
   $.get('https://kiang.github.io/tw_population/json/city/2021/06.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
-      if(!populationPool[cityKey]) {
+      if (!populationPool[cityKey]) {
         populationPool[cityKey] = 0;
       }
       populationPool[cityKey] += c[code].population;
@@ -439,7 +445,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/2022.json', {}, funct
 var showDayPool = {};
 var townPool = {};
 function showDayUpdate(r) {
-  for(k in cityMeta) {
+  for (k in cityMeta) {
     cityMeta[k].confirmed = 0;
     cityMeta[k].increase = 0;
     cityMeta[k].rate = 0.0;
@@ -480,17 +486,17 @@ function showDayUpdate(r) {
         increase: 0,
         avg7: 0.0,
       };
-      if(populationPool[cityKey]) {
+      if (populationPool[cityKey]) {
         cityMeta[cityKey].population = populationPool[cityKey];
       }
     }
-    if(!townPool[c1]) {
+    if (!townPool[c1]) {
       townPool[c1] = {};
     }
 
     var avg7Sum = 0;
     for (c2 in c[c1]) {
-      if(!townPool[c1][c2]) {
+      if (!townPool[c1][c2]) {
         townPool[c1][c2] = c1 + c2;
       }
       cityMeta[cityKey].confirmed += c[c1][c2];
@@ -500,18 +506,18 @@ function showDayUpdate(r) {
       }
     }
 
-    if(cityMeta[cityKey].increase > 0) {
-      if(cityMeta[cityKey].increase < cityMeta[cityKey].confirmed) {
+    if (cityMeta[cityKey].increase > 0) {
+      if (cityMeta[cityKey].increase < cityMeta[cityKey].confirmed) {
         cityMeta[cityKey].increaseRate = Math.round(cityMeta[cityKey].increase / (cityMeta[cityKey].confirmed - cityMeta[cityKey].increase) * 100) / 100;
       } else {
         cityMeta[cityKey].increaseRate = 1.0;
       }
     }
-    if(cityMeta[cityKey].population > 0) {
+    if (cityMeta[cityKey].population > 0) {
       cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
     }
     cityMeta[cityKey].avg7 = Math.round(avg7Sum / 7);
-    
+
   }
   if (populationDone) {
     city.getSource().refresh();
@@ -523,7 +529,7 @@ function showDay(theDay) {
     $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/' + theDay + '.json', {}, function (r) {
       showDayPool[r.meta.day] = r;
       showDayUpdate(showDayPool[r.meta.day]);
-    }).fail(function() {
+    }).fail(function () {
       dayEnd.setTime(dayEnd.getTime() - 86400000);
     });
   } else {

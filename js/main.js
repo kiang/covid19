@@ -85,15 +85,15 @@ map.on('singleclick', function (evt) {
       var message = '';
       if (p.COUNTYNAME) {
         var cityKey = p.COUNTYNAME + p.TOWNNAME;
+        sidebarTitle.innerHTML = cityKey;
+        currentFeature.setStyle(cityStyle);
+        lastFeatureType = 'area';
         if (cityMeta[cityKey]) {
           message += '<table class="table table-dark"><tbody>';
           message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
           message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
           message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
           message += '</tbody></table>';
-          sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
-          currentFeature.setStyle(cityStyle);
-          lastFeatureType = 'area';
 
           if (!townPool[cityKey]) {
             $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + townKeys[cityKey] + '.json', {}, function (r) {
@@ -103,8 +103,13 @@ map.on('singleclick', function (evt) {
           } else {
             showOdCharts(cityKey);
           }
+        } else {
+          message += '<table class="table table-dark"><tbody>';
+          message += '<tr><th scope="row">確診數量</th><td>0</td></tr>';
+          message += '<tr><th scope="row">人口</th><td>' + populationPool[cityKey] + '</td></tr>';
+          message += '<tr><th scope="row">比率</th><td>0(每萬人口)</td></tr>';
+          message += '</tbody></table>';
         }
-
       } else {
         message += '<table class="table table-dark"><tbody>';
         for (k in p) {
@@ -285,7 +290,7 @@ var colorTable = {
 };
 function updateColorTable() {
   var tableLines = '';
-  for(k in colorTable[mapStyle]) {
+  for (k in colorTable[mapStyle]) {
     tableLines += '<tr><td style="background-color: ' + colorTable[mapStyle][k][1] + '">&nbsp;&nbsp;</td><td> &gt;' + colorTable[mapStyle][k][0] + '</td></tr>';
   }
   $('table#colorTable').html(tableLines);
@@ -322,13 +327,13 @@ function cityStyle(f) {
       }
       break;
   }
-  for(k in colorTable[mapStyle]) {
-    if(color === '#ffffff' && keyRate > colorTable[mapStyle][k][0]) {
+  for (k in colorTable[mapStyle]) {
+    if (color === '#ffffff' && keyRate > colorTable[mapStyle][k][0]) {
       color = colorTable[mapStyle][k][1];
     }
   }
 
-  if(keyRate > 5) {
+  if (keyRate > 5) {
     textColor = '#ffffff';
   }
 
@@ -474,12 +479,12 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2022.json', {}, f
         }
       }
     }
-    rateList.sort(function(a, b) {
+    rateList.sort(function (a, b) {
       return b.rate - a.rate;
     });
     let listTable = '<table class="table table-bordered">';
     listTable += '<tr><th>區域</th><th>每萬人口比率</th><th>確診數</th></tr>';
-    for(k in rateList) {
+    for (k in rateList) {
       listTable += '<tr>';
       listTable += '<td>' + rateList[k].area + '</td>';
       listTable += '<td>' + rateList[k].rate + '</td>';
@@ -551,14 +556,14 @@ function showDayUpdate(r) {
           increase: 0,
           avg7: 0.0,
         };
-        if(populationPool[cityKey]) {
+        if (populationPool[cityKey]) {
           cityMeta[cityKey].population = populationPool[cityKey];
         }
       }
       cityMeta[cityKey].confirmed = c[c1][c2];
       cityMeta[cityKey].increaseRate = r.rate[c1][c2];
       cityMeta[cityKey].increase = r.increase[c1][c2];
-      if(cityMeta[cityKey].population > 0) {
+      if (cityMeta[cityKey].population > 0) {
         cityMeta[cityKey].rate = Math.round(cityMeta[cityKey].confirmed / cityMeta[cityKey].population * 1000000) / 100;
       }
       if (r.avg7 && r.avg7[c1] && r.avg7[c1][c2]) {

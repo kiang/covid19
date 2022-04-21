@@ -85,15 +85,15 @@ map.on('singleclick', function (evt) {
       var message = '';
       if (p.COUNTYNAME) {
         var cityKey = p.COUNTYNAME + p.TOWNNAME;
-        if (cityMeta[cityKey]) {
+        sidebarTitle.innerHTML = cityKey;
+        currentFeature.setStyle(cityStyle);
+        lastFeatureType = 'area';
+      if (cityMeta[cityKey]) {
           message += '<table class="table table-dark"><tbody>';
           message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
           message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
           message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
           message += '</tbody></table>';
-          sidebarTitle.innerHTML = p.COUNTYNAME + p.TOWNNAME;
-          currentFeature.setStyle(cityStyle);
-          lastFeatureType = 'area';
 
           if (!townPool[cityKey]) {
             $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/town/' + townKeys[cityKey] + '.json', {}, function (r) {
@@ -103,6 +103,12 @@ map.on('singleclick', function (evt) {
           } else {
             showOdCharts(cityKey);
           }
+        } else {
+          message += '<table class="table table-dark"><tbody>';
+          message += '<tr><th scope="row">確診數量</th><td>0</td></tr>';
+          message += '<tr><th scope="row">人口</th><td>' + populationPool[cityKey] + '</td></tr>';
+          message += '<tr><th scope="row">比率</th><td>0(每萬人口)</td></tr>';
+          message += '</tbody></table>';
         }
 
       } else {
@@ -455,7 +461,7 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/2022.json', {}, funct
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
 
-  $.get('https://kiang.github.io/tw_population/json/city/2021/06.json', {}, function (c) {
+  $.get('https://kiang.github.io/tw_population/json/city/2022/03.json', {}, function (c) {
     for (code in c) {
       populationPool[c[code].area] = c[code].population;
       if (cityMeta[c[code].area]) {
