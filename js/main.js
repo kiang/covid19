@@ -582,17 +582,33 @@ function showDay(theDay) {
       showDayPool[r.meta.day] = r;
       showDayUpdate(showDayPool[r.meta.day]);
     }).fail(function () {
-      dayEnd.setTime(dayEnd.getTime() - 86400000);
+      if (false === btnClicked) {
+        dayEnd.setTime(dayEnd.getTime() - 86400000);
+      } else {
+        var cDay = new Date(theDay.substring(0, 4), parseInt(theDay.substring(4, 6)) - 1, parseInt(theDay.substring(6, 8)));
+        var newDay;
+        if ('next' === btnClicked) {
+          newDay = new Date(cDay.getTime() + 86400000);
+          currentDay = getYMD(newDay);
+          showDay(getYMD(newDay));
+        } else {
+          newDay = new Date(cDay.getTime() - 86400000);
+          currentDay = getYMD(newDay);
+          showDay(getYMD(newDay));
+        }
+      }
     });
   } else {
     showDayUpdate(showDayPool[theDay]);
   }
 }
 
+var btnClicked = false;
 var today = new Date();
 var dayBegin = new Date(2022, 1, 1);
 var dayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 $('a#btn-Previous').click(function (e) {
+  btnClicked = 'previous';
   e.preventDefault();
   var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
   var newDay = new Date(cDay.getTime() - 86400000);
@@ -602,6 +618,7 @@ $('a#btn-Previous').click(function (e) {
 });
 
 $('a#btn-Next').click(function (e) {
+  btnClicked = 'next';
   e.preventDefault();
   var cDay = new Date(currentDay.substring(0, 4), parseInt(currentDay.substring(4, 6)) - 1, parseInt(currentDay.substring(6, 8)));
   var newDay = new Date(cDay.getTime() + 86400000);
