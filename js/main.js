@@ -590,7 +590,7 @@ function showDay(theDay) {
 }
 
 var today = new Date();
-var dayBegin = new Date(2021, 2, 30);
+var dayBegin = new Date(2022, 1, 1);
 var dayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 $('a#btn-Previous').click(function (e) {
   e.preventDefault();
