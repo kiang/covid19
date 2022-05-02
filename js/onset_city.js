@@ -235,6 +235,57 @@ function showOdCharts(cityKey) {
   chart3.render();
 }
 
+var colorTable = {
+  'countBased': [
+    [800, '#470617'],
+    [400, '#5f0926'],
+    [200, '#64036b'],
+    [100, '#75008b'],
+    [50, '#af004f'],
+    [20, '#d21a34'],
+    [10, '#ec6234'],
+    [5, '#ffa133'],
+    [3, '#ffd02c'],
+    [1, '#fffb26'],
+    [0, '#89cd43']
+  ],
+  'rateBased': [
+    [800, '#470617'],
+    [400, '#5f0926'],
+    [200, '#64036b'],
+    [100, '#75008b'],
+    [50, '#af004f'],
+    [20, '#af004f'],
+    [10, '#d21a34'],
+    [5, '#ec6234'],
+    [2, '#ffa133'],
+    [0.5, '#ffd02c'],
+    [0.2, '#fffb26'],
+    [0, '#89cd43']
+  ],
+  'avgBased': [
+    [800, '#470617'],
+    [400, '#5f0926'],
+    [200, '#64036b'],
+    [100, '#75008b'],
+    [50, '#af004f'],
+    [20, '#d21a34'],
+    [10, '#ec6234'],
+    [5, '#ffa133'],
+    [3, '#ffd02c'],
+    [1, '#fffb26'],
+    [0, '#89cd43']
+  ]
+};
+
+function updateColorTable() {
+  var tableLines = '';
+  for (k in colorTable[mapStyle]) {
+    tableLines += '<tr><td style="background-color: ' + colorTable[mapStyle][k][1] + '">&nbsp;&nbsp;</td><td> &gt;' + colorTable[mapStyle][k][0] + '</td></tr>';
+  }
+  $('table#colorTable').html(tableLines);
+}
+
 var mapStyle = 'countBased';
 function cityStyle(f) {
   var p = f.getProperties();
@@ -252,62 +303,22 @@ function cityStyle(f) {
       if (cityMeta[cityKey] && cityMeta[cityKey].confirmed) {
         keyRate = cityMeta[cityKey].rate;
       }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
-      }
       break;
     case 'rateBased':
       if (cityMeta[cityKey]) {
         keyRate = cityMeta[cityKey].increaseRate;
-      }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
       }
       break;
     case 'avgBased':
       if (cityMeta[cityKey]) {
         keyRate = cityMeta[cityKey].avg7;
       }
-      if (keyRate > 50) {
-        color = '#470115';
-      } else if (keyRate > 20) {
-        color = '#6f006d';
-      } else if (keyRate > 10) {
-        color = '#a4005b';
-      } else if (keyRate > 5) {
-        color = '#d00b33';
-      } else if (keyRate > 3) {
-        color = '#e75033';
-      } else if (keyRate > 1) {
-        color = '#ffa133';
-      } else if (keyRate > 0) {
-        color = '#e3d738';
-      }
       break;
+  }
+  for (k in colorTable[mapStyle]) {
+    if (color === '#ffffff' && keyRate > colorTable[mapStyle][k][0]) {
+      color = colorTable[mapStyle][k][1];
+    }
   }
 
   if (keyRate > 5) {
@@ -599,6 +610,7 @@ $('a#btn-countBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-countBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 $('a#btn-rateBased').click(function (e) {
@@ -607,6 +619,7 @@ $('a#btn-rateBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-rateBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 $('a#btn-avgBased').click(function (e) {
@@ -615,6 +628,7 @@ $('a#btn-avgBased').click(function (e) {
   city.getSource().refresh();
   $('a.btn-switch').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-avgBased').removeClass('btn-secondary').addClass('btn-primary');
+  updateColorTable();
 });
 
 var dataPlaying = false;
@@ -639,3 +653,5 @@ $('a#btn-pause').click(function (e) {
   $('a#btn-play').removeClass('btn-primary').addClass('btn-secondary');
   $('a#btn-pause').removeClass('btn-secondary').addClass('btn-primary');
 });
+
+updateColorTable();
