@@ -21,17 +21,6 @@ var appView = new ol.View({
   zoom: 14
 });
 
-var vectorPoints = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    url: 'https://kiang.github.io/nidss.cdc.gov.tw/data/points.json',
-    format: new ol.format.GeoJSON({
-      featureProjection: appView.getProjection()
-    })
-  }),
-  style: pointStyle,
-  zIndex: 100
-});
-
 var attribution = new ol.control.Attribution({
   collapsible: false,
   collapsed: true
@@ -50,7 +39,7 @@ var city = new ol.layer.Vector({
 });
 
 var map = new ol.Map({
-  layers: [city, vectorPoints],
+  layers: [city],
   target: 'map',
   view: appView,
   controls: ol.control.defaults({ attribution: false }).extend([attribution])
@@ -452,15 +441,6 @@ $('#btn-geolocation').click(function () {
 $('#btn-taiwan').click(function () {
   appView.setCenter(ol.proj.fromLonLat([120.221507, 23.000694]));
   return false;
-});
-
-$('#btn-pointShow').click(function () {
-  if (false === showPoints) {
-    showPoints = true;
-  } else {
-    showPoints = false;
-  }
-  vectorPoints.getSource().refresh();
 });
 
 var townKeys = {};
