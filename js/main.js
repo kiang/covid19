@@ -299,6 +299,7 @@ function updateColorTable() {
 }
 
 var mapStyle = 'countBased';
+var inPrint = false;
 function cityStyle(f) {
   var p = f.getProperties();
   var color = '#ffffff';
@@ -310,7 +311,10 @@ function cityStyle(f) {
   }
   var cityKey = p.COUNTYNAME + p.TOWNNAME;
   var keyRate = 0.0;
-  var textColor = '#000000';
+  var textColor = '#000000', textFont;
+  if (inPrint) {
+    strokeWidth = 5;
+  }
 
   switch (mapStyle) {
     case 'countBased':
@@ -338,6 +342,11 @@ function cityStyle(f) {
   if (keyRate > 5) {
     textColor = '#ffffff';
   }
+  if (!inPrint) {
+    textFont = '14px "Open Sans", "Arial Unicode MS", "sans-serif"';
+  } else {
+    textFont = '50px "Open Sans", "Arial Unicode MS", "sans-serif"';
+  }
 
   var baseStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
@@ -348,7 +357,7 @@ function cityStyle(f) {
       color: color
     }),
     text: new ol.style.Text({
-      font: '14px "Open Sans", "Arial Unicode MS", "sans-serif"',
+      font: textFont,
       fill: new ol.style.Fill({
         color: textColor
       })
@@ -492,7 +501,9 @@ $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2022.json', {}, f
 });
 
 var showDayPool = {};
+var jsonMeta = {};
 function showDayUpdate(r) {
+  jsonMeta = r.meta;
   for (k in cityMeta) {
     cityMeta[k].confirmed = 0;
     cityMeta[k].increase = 0;
@@ -689,3 +700,84 @@ $('a#btn-pause').click(function (e) {
 });
 
 updateColorTable();
+
+// export options for html2canvase.
+// See: https://html2canvas.hertzen.com/configuration
+const exportOptions = {
+  useCORS: true,
+  ignoreElements: function (element) {
+    const className = element.className || '';
+    if (!className.indexOf) {
+      return -1;
+    }
+    return !(
+      className.indexOf('ol-control') === -1 ||
+      className.indexOf('ol-scale') > -1 ||
+      (className.indexOf('ol-attribution') > -1 &&
+        className.indexOf('ol-uncollapsible'))
+    );
+  }
+};
+
+const dims = {
+  a0: [1189, 841],
+  a1: [841, 594],
+  a2: [594, 420],
+  a3: [420, 297],
+  a4: [297, 210],
+  a5: [210, 148],
+};
+
+$('a#btn-print').click(function (e) {
+  inPrint = true;
+  e.preventDefault();
+  const format = 'a3';
+  const resolution = 300;
+  const scale = 100;
+  const dim = dims[format];
+  const width = Math.round((dim[0] * resolution) / 25.4);
+  const height = Math.round((dim[1] * resolution) / 25.4);
+  const viewResolution = map.getView().getResolution();
+  const scaleResolution =
+    scale /
+    ol.proj.getPointResolution(
+      map.getView().getProjection(),
+      resolution / 25.4,
+      map.getView().getCenter()
+    );
+
+  map.once('rendercomplete', function () {
+    exportOptions.width = width;
+    exportOptions.height = height;
+    html2canvas(map.getViewport(), exportOptions).then(function (canvas) {
+      const pdf = new jspdf.jsPDF('landscape', undefined, format);
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg'),
+        'JPEG',
+        0,
+        0,
+        dim[0],
+        dim[1]
+      );
+      pdf.setFontSize(30);
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 265, 152, 40, 'F');
+      pdf.text(5, 277, jsonMeta.modified);
+      pdf.text(5, 292, 'https://kiang.github.io/covid19/');
+      pdf.save('map.pdf');
+      inPrint = false;
+      // Reset original map size
+      map.getTargetElement().style.width = '';
+      map.getTargetElement().style.height = '';
+      map.updateSize();
+      map.getView().setResolution(viewResolution);
+      document.body.style.cursor = 'auto';
+    });
+  });
+
+  // Set print size
+  map.getTargetElement().style.width = width + 'px';
+  map.getTargetElement().style.height = height + 'px';
+  map.updateSize();
+  map.getView().setResolution(scaleResolution);
+});
