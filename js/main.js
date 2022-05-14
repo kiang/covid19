@@ -339,7 +339,7 @@ function cityStyle(f) {
     }
   }
 
-  if (keyRate > 5) {
+  if (keyRate > 20) {
     textColor = '#ffffff';
   }
   if (!inPrint) {
