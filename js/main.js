@@ -82,6 +82,7 @@ map.on('singleclick', function (evt) {
           message += '<tr><th scope="row">確診數量</th><td>' + cityMeta[cityKey].confirmed + '</td></tr>';
           message += '<tr><th scope="row">人口</th><td>' + cityMeta[cityKey].population + '</td></tr>';
           message += '<tr><th scope="row">比率</th><td>' + cityMeta[cityKey].rate + '(每萬人口)</td></tr>';
+          message += '<tr><td colspan="2" style="text-align:center;"> 每 ' + Math.round(cityMeta[cityKey].population / cityMeta[cityKey].confirmed) + ' 人就有 1 人確診</td></tr>';
           message += '</tbody></table>';
 
           if (!townPool[cityKey]) {
