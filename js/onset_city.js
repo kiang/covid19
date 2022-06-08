@@ -434,7 +434,7 @@ var populationPool = {};
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/2022.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
-  $.get('https://kiang.github.io/tw_population/json/city/2022/03.json', {}, function (c) {
+  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2022/04.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
       if (!populationPool[cityKey]) {
