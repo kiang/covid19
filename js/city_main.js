@@ -239,30 +239,30 @@ function showOdCharts(cityKey) {
 
 var colorTable = {
   'countBased': [
-    [800, '#470617'],
-    [400, '#5f0926'],
-    [200, '#64036b'],
-    [100, '#75008b'],
-    [50, '#af004f'],
-    [20, '#d21a34'],
-    [10, '#ec6234'],
-    [5, '#ffa133'],
-    [3, '#ffd02c'],
-    [1, '#fffb26'],
+    [5120, '#470617'],
+    [2560, '#5f0926'],
+    [1280, '#64036b'],
+    [640, '#75008b'],
+    [320, '#af004f'],
+    [160, '#d21a34'],
+    [80, '#ec6234'],
+    [40, '#ffa133'],
+    [20, '#ffd02c'],
+    [10, '#fffb26'],
     [0, '#89cd43']
   ],
   'rateBased': [
-    [800, '#470617'],
-    [400, '#5f0926'],
-    [200, '#64036b'],
-    [100, '#75008b'],
-    [50, '#af004f'],
-    [20, '#af004f'],
-    [10, '#d21a34'],
-    [5, '#ec6234'],
-    [2, '#ffa133'],
-    [0.5, '#ffd02c'],
-    [0.2, '#fffb26'],
+    [10.24, '#470617'],
+    [5.12, '#5f0926'],
+    [2.56, '#64036b'],
+    [1.28, '#75008b'],
+    [0.64, '#af004f'],
+    [0.32, '#af004f'],
+    [0.16, '#d21a34'],
+    [0.08, '#ec6234'],
+    [0.04, '#ffa133'],
+    [0.02, '#ffd02c'],
+    [0.01, '#fffb26'],
     [0, '#89cd43']
   ],
   'avgBased': [
@@ -318,7 +318,7 @@ function cityStyle(f) {
       break;
   }
   for (k in colorTable[mapStyle]) {
-    if (color === '#ffffff' && keyRate > colorTable[mapStyle][k][0]) {
+    if (color === 'rgba(255,255,255,0.5)' && keyRate > colorTable[mapStyle][k][0]) {
       color = colorTable[mapStyle][k][1];
     }
   }
@@ -436,7 +436,7 @@ var populationPool = {};
 $.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2022.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
-  $.get('https://kiang.github.io/tw_population/json/city/2021/06.json', {}, function (c) {
+  $.get('https://kiang.github.io/tw_population/json/city/2022/03.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
       if (!populationPool[cityKey]) {
