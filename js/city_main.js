@@ -433,10 +433,10 @@ var cityKeys = {};
 var currentDay = '';
 var populationDone = false;
 var populationPool = {};
-$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2022.json', {}, function (r) {
+$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2023.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
-  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2022/04.json', {}, function (c) {
+  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2022/11.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
       if (!populationPool[cityKey]) {
