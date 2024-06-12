@@ -85,7 +85,7 @@ map.on('singleclick', function (evt) {
           if (!cityPool[cityKey]) {
             currentTownCount[cityKey] = Object.keys(townPool[odCityKey]).length;
             for (town in townPool[odCityKey]) {
-              $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/town/' + townPool[odCityKey][town] + '.json', {}, function (r) {
+              $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od2024/onset/town/' + townPool[odCityKey][town] + '.json', {}, function (r) {
                 var cityKey = r.city;
                 switch (cityKey) {
                   case '台南市':
@@ -431,10 +431,10 @@ var cityKeys = {};
 var currentDay = '';
 var populationDone = false;
 var populationPool = {};
-$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/2023.json', {}, function (r) {
+$.get('https://kiang.github.io/od.cdc.gov.tw/data/od2024/onset/2024.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
-  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2022/11.json', {}, function (c) {
+  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2024/05.json', {}, function (c) {
     for (code in c) {
       var cityKey = c[code].area.substring(0, 3);
       if (!populationPool[cityKey]) {
@@ -537,7 +537,7 @@ function showDayUpdate(r) {
 function showDay(theDay) {
   $('#showingDay').html(theDay);
   if (!showDayPool[theDay]) {
-    $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/onset/' + theDay + '.json', {}, function (r) {
+    $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od2024/onset/' + theDay + '.json', {}, function (r) {
       showDayPool[r.meta.day] = r;
       showDayUpdate(showDayPool[r.meta.day]);
     }).fail(function () {

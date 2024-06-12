@@ -86,7 +86,7 @@ map.on('singleclick', function (evt) {
           message += '</tbody></table>';
 
           if (!townPool[cityKey]) {
-            $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/town/' + townKeys[cityKey] + '.json', {}, function (r) {
+            $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od2024/town/' + townKeys[cityKey] + '.json', {}, function (r) {
               townPool[cityKey] = r;
               showOdCharts(cityKey);
             });
@@ -457,11 +457,11 @@ var currentDay = '';
 var populationDone = false;
 var populationPool = {};
 var rateList = [];
-$.get('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/2023.json', {}, function (r) {
+$.get('https://kiang.github.io/od.cdc.gov.tw/data/od2024/confirmed/2024.json', {}, function (r) {
   showDayPool[r.meta.day] = r;
   showDayUpdate(showDayPool[r.meta.day]);
 
-  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2022/11.json', {}, function (c) {
+  $.get('https://kiang.github.io/data.moi.gov.tw/json/population/city/2024/05.json', {}, function (c) {
     for (code in c) {
       populationPool[c[code].area] = c[code].population;
       if (cityMeta[c[code].area]) {
@@ -583,7 +583,7 @@ function showDayUpdate(r) {
 function showDay(theDay) {
   $('#showingDay').html(theDay);
   if (!showDayPool[theDay]) {
-    $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od/confirmed/' + theDay + '.json', {}, function (r) {
+    $.getJSON('https://kiang.github.io/od.cdc.gov.tw/data/od2024/confirmed/' + theDay + '.json', {}, function (r) {
       showDayPool[r.meta.day] = r;
       showDayUpdate(showDayPool[r.meta.day]);
     }).fail(function () {
